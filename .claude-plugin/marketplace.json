@@ -1,0 +1,16 @@
+{
+  "name": "dev-process-kit",
+  "owner": {
+    "name": "neko3cs"
+  },
+  "metadata": {
+    "description": "Software development process skills for AI coding agents."
+  },
+  "plugins": [
+    {
+      "name": "dev-process-kit",
+      "description": "Software development process skills for AI coding agents; like a spec-driven-development.",
+      "source": "./plugins/dev-process-kit"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "dev-process-kit",
+  "interface": {
+    "displayName": "dev process kit"
+  },
+  "plugins": [
+    {
+      "name": "dev-process-kit",
+      "source": {
+        "source": "local",
+        "path": "./plugins/dev-process-kit"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
