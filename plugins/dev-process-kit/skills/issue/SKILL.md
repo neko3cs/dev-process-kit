@@ -1,10 +1,10 @@
 ---
-name: create-issue
+name: issue
 description: Creates a GitHub Issue with the gh CLI that records the user's request, following the target repository's Issue templates when it has them, filling every required field from the user's request and composing the body in GitHub's rendered heading format. Use whenever a GitHub Issue (bug report or feature request) is being filed — when the user asks ("create an issue", "file a bug", "Issueを作って", "バグ報告を起票して", "機能要望をIssueにして", "○○の機能が欲しいのでIssueを作って"), or when a workflow step says to file one. Also use when recording context on an existing Issue as a comment — background, investigation results, or the course of a discussion ("add a comment to the issue", "Issueにコメントして", "調査結果をIssueに残して", "議論の経緯をIssueに残して").
 license: MIT
 ---
 
-# create-issue Skill
+# issue Skill
 
 ## 概要
 

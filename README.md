@@ -10,9 +10,9 @@ AI コーディングエージェント向けの開発プロセス系スキル�
 
 | スキル | 役割 |
 | :--- | :--- |
-| `create-issue` | 要望を GitHub Issue に起票する。リポジトリの Issue テンプレートがあれば従う |
-| `design-docs` | Issue を `requirements.md`・`specification.md`・`architecture.md` の3文書に設計し、設計 PR を作る |
-| `implement-design` | マージ済みの設計文書をもとに、Issue 1つにつき1つの実装 PR で実装する |
+| `issue` | 要望を GitHub Issue に起票する。リポジトリの Issue テンプレートがあれば従う |
+| `design` | Issue を `requirements.md`・`specification.md`・`architecture.md` の3文書に設計し、設計 PR を作る |
+| `implement` | マージ済みの設計文書をもとに、Issue 1つにつき1つの実装 PR で実装する |
 | `hello` | 導入確認用。決まった1行を返す |
 
 PR の書式、実装の進め方、テストや品質ゲートの方法は、このプラグインでは決めません。リポジトリの規約と利用者の指示に従います。
@@ -85,9 +85,9 @@ codex plugin marketplace upgrade dev-process-kit
     ├── .claude-plugin/plugin.json       # Claude Code 用マニフェスト
     ├── .codex-plugin/plugin.json        # Codex 用マニフェスト
     └── skills/                          # 両ハーネス共通のスキル
-        ├── create-issue/
-        ├── design-docs/
-        ├── implement-design/
+        ├── issue/
+        ├── design/
+        ├── implement/
         └── hello/
 ```
 

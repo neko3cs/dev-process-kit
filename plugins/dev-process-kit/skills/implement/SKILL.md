@@ -1,10 +1,10 @@
 ---
-name: implement-design
-description: Implement a GitHub issue from requirements.md, specification.md, and architecture.md on one implementation PR. Scope work by matching the issue and design PR changes to the design docs, implement and verify against the design docs, mark ready for review, and address implementation PR reviews. Commit, push, and create or update the PR without per-operation approval. When the design is missing, undecided, or wrong, do not implement on assumptions; stop and get the design fixed in a separate design PR, then resume after it is merged (if the user does not want design docs, ask in chat instead). Use for "/dev-process-kit:implement-design 4", "$dev-process-kit:implement-design 4", "implement issue #4", "resolve issue #4", "fix issue #4", "#4を実装して", "#4を解決して", "#4を直して", "実装PRのレビューを反映して", or "PR #5 のレビューに対応して".
+name: implement
+description: Implement a GitHub issue from requirements.md, specification.md, and architecture.md on one implementation PR. Scope work by matching the issue and design PR changes to the design docs, implement and verify against the design docs, mark ready for review, and address implementation PR reviews. Commit, push, and create or update the PR without per-operation approval. When the design is missing, undecided, or wrong, do not implement on assumptions; stop and get the design fixed in a separate design PR, then resume after it is merged (if the user does not want design docs, ask in chat instead). Use for "/dev-process-kit:implement 4", "$dev-process-kit:implement 4", "implement issue #4", "resolve issue #4", "fix issue #4", "#4を実装して", "#4を解決して", "#4を直して", "実装PRのレビューを反映して", or "PR #5 のレビューに対応して".
 license: MIT
 ---
 
-# implement-design Skill
+# implement Skill
 
 ## 概要
 
@@ -19,10 +19,10 @@ license: MIT
 ## 使い方
 
 ```
-/dev-process-kit:implement-design <issue番号>
+/dev-process-kit:implement <issue番号>
 ```
 
-Codex では `$dev-process-kit:implement-design <issue番号>` と書きます。
+Codex では `$dev-process-kit:implement <issue番号>` と書きます。
 
 ## 最初に確かめる
 
@@ -30,7 +30,7 @@ Codex では `$dev-process-kit:implement-design <issue番号>` と書きます�
 2. 同じ Issue の実装PRを探す（`gh pr list --head <ブランチ名>`、見つからなければ `gh pr list --search "#<番号>"`）。差分が設計文書だけのPRは設計PRなので、実装PRとして扱わない。
    - Ready for review の実装PRがある → 「Ready for review の後: 指摘に対応する」に進む。
    - Draft の実装PRがある → そのブランチに切り替え、統合ブランチに設計の変更がマージされていれば実装ブランチにマージし、手順5の確認をしてから「実装する」の続きを進める（ブランチもPRも作り直さない）。作業範囲と残作業は Issue、PR本文、差分から読み、設計文書の該当箇所と照合する。
-3. 依頼されたPRの差分が設計文書だけなら、`dev-process-kit:design-docs` でそのPRのレビュー対応を行う。実装PRは新しく作らない。
+3. 依頼されたPRの差分が設計文書だけなら、`dev-process-kit:design` でそのPRのレビュー対応を行う。実装PRは新しく作らない。
 4. 統合ブランチを最新にし、作業範囲を決める。
    - Issue の本文・コメントから対象の機能と変更要求を読み、`gh pr list --state merged --search "#<番号>"` で関連する設計PRを探す。検索結果は本文と差分を読み、対象Issueに関係するものか確認する。
    - 設計PRがあれば、その本文・レビュー・差分から変更された仕様を把握し、現在の設計文書の該当箇所と照合して作業範囲を決める。無関係な変更は含めない。
@@ -45,7 +45,7 @@ Codex では `$dev-process-kit:implement-design <issue番号>` と書きます�
 1. ユーザーが、意図して設計文書を残さない意向を示している場合は、足りない点をチャットで質問し、回答で決まった内容で実装する。設計PRは作らない。
 2. そうでなければ、同じ Issue の未マージの設計PRを探す（`gh pr list --search "#<番号>"` で見つかった PR のうち、差分が設計文書だけのもの）。
    - 設計PRがある → 作業を止め、その設計PRのマージを待つことをユーザーに伝えて終える。
-   - 設計PRが無い → 統合ブランチから設計用のブランチを作り、`dev-process-kit:design-docs` で Issue を設計して設計PRを作る。設計PRのURLを示し、そのマージを待つことを伝えて終える。
+   - 設計PRが無い → 統合ブランチから設計用のブランチを作り、`dev-process-kit:design` で Issue を設計して設計PRを作る。設計PRのURLを示し、そのマージを待つことを伝えて終える。
 3. 設計PRがマージされたら、もう一度このスキルで実装を始める。
 
 ## 書き残す先
@@ -54,7 +54,7 @@ Codex では `$dev-process-kit:implement-design <issue番号>` と書きます�
 
 | 残す先 | 残すもの |
 | :--- | :--- |
-| 設計文書 | 判断の理由、仕様、制約など、設計文書に残すべき情報。`dev-process-kit:design-docs` で書く |
+| 設計文書 | 判断の理由、仕様、制約など、設計文書に残すべき情報。`dev-process-kit:design` で書く |
 | PR本文 | PRの概要、確認状況の要約、動作確認 |
 | PR コメント | 人の判断を問う具体的な質問、設計文書に残すべきでない情報（デバッグ中の CI の結果など） |
 
@@ -73,7 +73,7 @@ Codex では `$dev-process-kit:implement-design <issue番号>` と書きます�
 5. 設計文書とコードを突き合わせる。
    - 作業範囲の中で食い違いがあれば、文書に記載した仕様を正としてコードを直す（利用者が確認するのは文書で、コードはあまり読まないため）。文書をコードに合わせて書き換えない。文書のほうが間違っていると判断したら、手順4に従う。
    - 作業範囲の外で見つけた食い違いは、直さずに PR コメントで知らせる（別の不具合として扱うため）。
-6. 実装の途中で分かった考え・暗黙知・調査結果のうち、合意済みの仕様を変えずに設計文書へ残すべきもの（判断の理由、見つけた制約など）は、`dev-process-kit:design-docs` で反映する。仕様を変える必要があるものは、手順4に従う。設計文書に残すべきでないものは PR コメントに書く。
+6. 実装の途中で分かった考え・暗黙知・調査結果のうち、合意済みの仕様を変えずに設計文書へ残すべきもの（判断の理由、見つけた制約など）は、`dev-process-kit:design` で反映する。仕様を変える必要があるものは、手順4に従う。設計文書に残すべきでないものは PR コメントに書く。
    - 設計文書は Issue・PR・コードから独立して仕様を理解できる状態に保ち、未実装でこれから実装が必要であることを示すメモは残さない。実装済み・保留の範囲は PR本文で管理する。
 7. プロジェクトの品質ゲート（リポジトリの規約や利用者の指示で決まる検証）を通す。手順2で記録した元々の失敗は無視してよいが、新たに失敗するようになったテストは直す。
 8. コミットして push し、実装PRを作る（または本文を更新する）。PRの作り方と本文の書式は、リポジトリの規約や利用者の指示に従う。本文には動作確認、受け入れ基準ごとの対応するテストを書く。Issue の紐付けは「コミット」節に従い `Closes #<番号>` とする。Ready にする前なら Draft で作り、コミットのたびに push してよい。
@@ -84,7 +84,7 @@ Codex では `$dev-process-kit:implement-design <issue番号>` と書きます�
 実装の途中で、設計の不足・未決が見つかった、またはマージ済みの設計が間違っていると判断したら、AI が独断で仕様を書き換えたことにしないため、実装を止めて設計を先に直します。
 
 1. それまでの実装をコミットして実装ブランチに push する。実装PRがあれば Draft にし、設計の変更を待っていることを PR本文に書く。
-2. 統合ブランチから設計用のブランチを別に作り、`dev-process-kit:design-docs` で設計文書だけを直した設計PRを作る。実装ブランチの変更は含めない。
+2. 統合ブランチから設計用のブランチを別に作り、`dev-process-kit:design` で設計文書だけを直した設計PRを作る。実装ブランチの変更は含めない。
 3. 設計PRのURLと、そのマージを待って実装を止めていることをユーザーに伝えて終える。
 4. 設計PRが統合ブランチにマージされたら、統合ブランチを実装ブランチにマージし、直った設計に沿って実装を再開する。
 
@@ -102,7 +102,7 @@ Ready の PR への push は、**ひとまとまりの対応ごとに1回** に�
 
 1. Issue、PR の差分と PR本文（受け入れ基準ごとの対応するテスト）を設計文書と照合して作業範囲を読み、PR のレビューとコメントを読んで、そのとき来ている指摘をすべて把握する。自動チェック（セキュリティレビューなど）の指摘も、人のレビューの指摘と同じに扱う。
 2. 指摘をすべて直す。直し方は「実装する」の手順3〜6に従う。指摘を直すために設計を変える必要があれば、「設計を直す必要があるとき」に従う。コミットは指摘ごとに分けてよいが、1件直すたびに push しない。
-3. 残したほうがいい考え・暗黙知・調査結果（直し方を選んだ理由、見つけた制約など）が生じたら、仕様を変えずに設計文書に残すべきものは、ここで `dev-process-kit:design-docs` で反映する（手順5の push に含めるため）。残すべきでないものは、手順6で PR に新規コメントとして書く。
+3. 残したほうがいい考え・暗黙知・調査結果（直し方を選んだ理由、見つけた制約など）が生じたら、仕様を変えずに設計文書に残すべきものは、ここで `dev-process-kit:design` で反映する（手順5の push に含めるため）。残すべきでないものは、手順6で PR に新規コメントとして書く。
 4. ローカルで品質ゲートを通す。
 5. 1回 push し、PR本文の動作確認を更新する。
 6. コードに付いた指摘ごとに、その指摘へのリプライとして対応を書く（どう直したか、直さなかった・別の直し方を採った理由など）。`gh api repos/{owner}/{repo}/pulls/<PR番号>/comments/<コメントID>/replies -f body=...` でそのスレッドに返す。リプライへのリプライは API が受け付けないため、`<コメントID>` にはスレッドの最初のコメントの ID を使う。コードに付いていないコメントへの定型返信は不要だが、質問への回答は読み取り、実装・テストとPR本文に反映する。新たな判断が必要なら別途新規コメントで質問する。手順3で PR コメントに回したものは、ここで新規コメントとして書く。push の後に書くのは、コメントが push 済みのコミットを指せるようにするため。
@@ -128,15 +128,15 @@ Ready の PR への push は、**ひとまとまりの対応ごとに1回** に�
 
 | スキル | 使う場面 |
 | :--- | :--- |
-| `dev-process-kit:design-docs` | 設計が足りないときの設計PR作成、設計を直すための設計PR作成、仕様を変えない補足の反映 |
+| `dev-process-kit:design` | 設計が足りないときの設計PR作成、設計を直すための設計PR作成、仕様を変えない補足の反映 |
 
 ## サンプル対話
 
-**User:** /dev-process-kit:implement-design 44
+**User:** /dev-process-kit:implement 44
 
-**Agent:** #44 の内容が設計文書に無く、設計PRもまだありませんでした。`main` から設計用のブランチを作り、`dev-process-kit:design-docs` で設計PRを作成しました。このPRのマージを待って、実装は始めずに止めています。URL: ...
+**Agent:** #44 の内容が設計文書に無く、設計PRもまだありませんでした。`main` から設計用のブランチを作り、`dev-process-kit:design` で設計PRを作成しました。このPRのマージを待って、実装は始めずに止めています。URL: ...
 
-**User:** （設計PRをマージしてから）/dev-process-kit:implement-design 44
+**User:** （設計PRをマージしてから）/dev-process-kit:implement 44
 
 **Agent:** マージされた設計文書をもとに実装し、品質ゲートを通して Ready for review の実装PRを作成しました。URL: ... UATでは `specification.md` の業務ルール「馬番の取り込み」を参考にご確認ください。
 

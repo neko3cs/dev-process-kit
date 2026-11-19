@@ -1,10 +1,10 @@
 ---
-name: design-docs
+name: design
 description: Create and maintain three design documents (requirements.md, specification.md, architecture.md), including designing a GitHub issue into acceptance criteria and business rules. Use for "write design docs", "design issue #4", "update the specification", "設計ドキュメントを作って", "ドキュメントを整備して", "#4を設計して", "要件定義して", "要件をまとめて", "設計PRのレビューを反映して", "仕様変更をドキュメントに反映して", or "この実装を設計書に反映して", including workflow requests to update docs or compare them with code. Keep docs self-contained and authoritative; report mismatches as code defects unless a specification change is requested. Propose explicit assumptions for undecided design and ask concrete questions in PR comments. Commit, push, and create or update a PR without per-operation approval. Do not implement code.
 license: MIT
 ---
 
-# design-docs Skill
+# design Skill
 
 `requirements.md` / `specification.md` / `architecture.md` の3ファイルを作成・更新します。
 
