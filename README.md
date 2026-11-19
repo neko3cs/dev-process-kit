@@ -2,14 +2,29 @@
 
 Software development process skills for AI coding agents; like a spec-driven-development.
 
-AI コーディングエージェント向けの開発プロセス系スキルをまとめたプラグインです。現在は導入確認用の `hello` スキルだけが入っています。Claude Code と Codex の両方に、このリポジトリをマーケットプレイスとして追加すれば導入できます。
+AI コーディングエージェント向けの開発プロセス系スキルをまとめたプラグインです。Claude Code と Codex の両方に、このリポジトリをマーケットプレイスとして追加すれば導入できます。
+
+## スキル
+
+要望を Issue に記録し、設計文書で仕様を合意してから、Issue ごとに1つの PR で実装する、という流れを3つのスキルで進めます。
+
+| スキル | 役割 |
+| :--- | :--- |
+| `create-issue` | 要望を GitHub Issue に起票する。リポジトリの Issue テンプレートがあれば従う |
+| `design-docs` | Issue を `requirements.md`・`specification.md`・`architecture.md` の3文書に設計し、設計 PR を作る |
+| `implement-design` | マージ済みの設計文書をもとに、Issue 1つにつき1つの実装 PR で実装する |
+| `hello` | 導入確認用。決まった1行を返す |
+
+PR の書式、実装の進め方、テストや品質ゲートの方法は、このプラグインでは決めません。リポジトリの規約と利用者の指示に従います。
 
 ## 対応ハーネス
 
 | ハーネス | マーケットプレイス定義 | プラグインマニフェスト | スキル呼び出し |
 | :--- | :--- | :--- | :--- |
-| Claude Code | `.claude-plugin/marketplace.json` | `plugins/dev-process-kit/.claude-plugin/plugin.json` | `/dev-process-kit:hello` |
-| Codex | `.agents/plugins/marketplace.json` | `plugins/dev-process-kit/.codex-plugin/plugin.json` | `$dev-process-kit:hello` |
+| Claude Code | `.claude-plugin/marketplace.json` | `plugins/dev-process-kit/.claude-plugin/plugin.json` | `/dev-process-kit:<スキル名>` |
+| Codex | `.agents/plugins/marketplace.json` | `plugins/dev-process-kit/.codex-plugin/plugin.json` | `$dev-process-kit:<スキル名>` |
+
+スキル名には `dev-process-kit:` が付くので、同じ名前のスキルを別に入れていても取り違えません。
 
 スキル本体（`plugins/dev-process-kit/skills/`）は両ハーネスで共通です。
 
@@ -69,7 +84,11 @@ codex plugin marketplace upgrade dev-process-kit
 └── plugins/dev-process-kit/
     ├── .claude-plugin/plugin.json       # Claude Code 用マニフェスト
     ├── .codex-plugin/plugin.json        # Codex 用マニフェスト
-    └── skills/hello/SKILL.md            # 両ハーネス共通のスキル
+    └── skills/                          # 両ハーネス共通のスキル
+        ├── create-issue/
+        ├── design-docs/
+        ├── implement-design/
+        └── hello/
 ```
 
 ## ライセンス
