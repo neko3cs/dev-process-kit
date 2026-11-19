@@ -4,6 +4,9 @@
 
 - When a release changes plugin contents, bump `version` to the same value in both `plugins/dev-process-kit/.claude-plugin/plugin.json` and `plugins/dev-process-kit/.codex-plugin/plugin.json`. Claude Code delivers an update only when the version changes, so new commits pushed under the old version never reach installed users. Codex (`codex plugin marketplace upgrade`, checked on 0.168.0) refreshes the cache even without a bump, so a missed bump breaks only Claude Code users and goes unnoticed.
 - Do not set `version` on the marketplace entries. If both an entry and `plugin.json` set it, Claude Code uses the `plugin.json` value without warning.
+- Skills must not reference anything outside this plugin: other skills (such as `create-pullrequest`, `test-as-tdd`, `test-code`) or author-specific templates (such as `neko3cs/.github`). Do not replace such a reference with a hint at a specific method or an instruction to look for related skills either; that still steers how users work. Leave PR format, implementation technique, and testing to the user's repository rules and instructions.
+- Refer to skills inside this plugin by their namespaced name (`dev-process-kit:design-docs`, not `design-docs`). Users may also have same-name skills from neko3cs/skills installed.
+- Do not hand the process core over to users as "their own method": a merged design PR freezes the spec, one implementation PR per Issue, pending decisions stay in Draft, and design changes found during implementation go to a separate design PR. The owner explicitly rejected treating these as user-specific.
 
 ## Implicit Constraints
 
