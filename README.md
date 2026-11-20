@@ -45,10 +45,6 @@ flowchart TD
 | Claude Code | `.claude-plugin/marketplace.json` | `plugins/dev-process-kit/.claude-plugin/plugin.json` |
 | Codex | `.agents/plugins/marketplace.json` | `plugins/dev-process-kit/.codex-plugin/plugin.json` |
 
-スキルはどちらのハーネスでも `/dev-process-kit:<スキル名>` で呼び出せます。スキル名には `dev-process-kit:` が付くので、同じ名前のスキルを別に入れていても取り違えません。
-
-スキル本体（`plugins/dev-process-kit/skills/`）は両ハーネスで共通です。
-
 ## 導入方法
 
 ```sh
