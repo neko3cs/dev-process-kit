@@ -1,0 +1,12 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "dev-process-kit",
+  "version": "0.6.0",
+  "description": "Software development process skills for AI coding agents; like a spec-driven-development.",
+  "author": {
+    "name": "neko3cs"
+  },
+  "homepage": "https://github.com/neko3cs/dev-process-kit",
+  "repository": "https://github.com/neko3cs/dev-process-kit",
+  "license": "MIT"
+}
