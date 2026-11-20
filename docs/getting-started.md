@@ -1,29 +1,31 @@
 # Getting Started
 
-dev-process-kit を導入し、1つの要望を Issue から実装 PR のマージまで通す流れを説明します。工程の考え方は [dev-process-kit の思想](philosophy.md)、各スキルの詳細は [スキルリファレンス](skills.md) を参照してください。
+English | [日本語](getting-started.ja.md)
 
-## 前提
+This guide installs dev-process-kit and takes one request from an Issue all the way to a merged implementation PR. For the thinking behind the phases, see [Philosophy](philosophy.md); for details on each skill, see the [Skill reference](skills.md).
 
-- 対象のプロジェクトが GitHub リポジトリであること
-- [GitHub CLI（`gh`）](https://cli.github.com/) がインストールされ、`gh auth login` で認証済みであること
-- 対応ハーネス（Claude Code、Codex、GitHub Copilot CLI、Antigravity）のいずれかが使えること
+## Prerequisites
 
-## 全体の流れ
+- Your project is a GitHub repository.
+- [GitHub CLI (`gh`)](https://cli.github.com/) is installed and authenticated with `gh auth login`.
+- You can use one of the supported harnesses: Claude Code, Codex, GitHub Copilot CLI, or Antigravity.
 
-導入の後、工程は上から順に進みます。「—」の工程は人が行います。工程名から、このページの対応する手順に飛べます。
+## The flow at a glance
 
-| No. | 工程 | スキル | 内容 |
+After installation, the phases run from top to bottom. Phases marked "—" are done by a person. Each phase name links to its step on this page.
+
+| No. | Phase | Skill | What happens |
 | :--- | :--- | :--- | :--- |
-| 1 | [起票](#2-要望を-issue-に起票する) | `issue` | 要望を Issue に残す。何を作るかの合意や受け入れ基準はここでは決めない |
-| 2 | [設計](#3-設計-pr-を作る) | `design` | Issue を3つの設計文書に落とし込み、設計 PR を作る。未決の箇所は仮案で書き、PR コメントで質問する |
-| 3 | [設計の合意](#4-設計-pr-をレビューしてマージする人の作業) | — | 人が設計 PR をレビューしてマージする。マージで仕様が合意され、凍結される |
-| 4 | [実装](#5-実装-pr-を作る) | `implement` | 合意済みの設計文書だけを実装し、Issue 1つにつき1つの実装 PR を作る。判断待ちがあるあいだは Draft のままにする |
-| 5 | [受け入れテスト](#6-受け入れテストをして実装-pr-をマージする人の作業) | — | 人が `requirements.md` の受け入れ基準に照らして受け入れテストをし、GO / NO-GO を判断する。NO-GO なら実装に戻る |
-| 6 | [実装の合意](#6-受け入れテストをして実装-pr-をマージする人の作業) | — | 人が実装 PR をレビューしてマージする。マージで Issue が完了する |
+| 1 | [File](#2-file-the-request-as-an-issue) | `issue` | The request is recorded in an Issue. What to build and the acceptance criteria are not decided here |
+| 2 | [Design](#3-open-a-design-pr) | `design` | The Issue is designed into three documents and a design PR is opened. Undecided points are written as provisional proposals and asked about in PR comments |
+| 3 | [Design agreement](#4-review-and-merge-the-design-pr-your-part) | — | A person reviews and merges the design PR. The merge means the specification is agreed and frozen |
+| 4 | [Implementation](#5-open-an-implementation-pr) | `implement` | Only the agreed design documents are implemented, with one implementation PR per Issue. The PR stays in Draft while a decision is pending |
+| 5 | [Acceptance testing](#6-run-acceptance-tests-and-merge-the-implementation-pr-your-part) | — | A person runs acceptance tests against the acceptance criteria in `requirements.md` and decides GO / NO-GO. NO-GO sends the work back to implementation |
+| 6 | [Implementation agreement](#6-run-acceptance-tests-and-merge-the-implementation-pr-your-part) | — | A person reviews and merges the implementation PR. The merge completes the Issue |
 
-## 1. 導入する
+## 1. Install
 
-ハーネスに合わせて、マーケットプレイスを追加してからプラグインを導入します。
+Add the marketplace for your harness, then install the plugin.
 
 ```sh
 # Claude Code
@@ -38,73 +40,73 @@ codex plugin add dev-process-kit@dev-process-kit
 copilot plugin marketplace add neko3cs/dev-process-kit
 copilot plugin install dev-process-kit@dev-process-kit
 
-# Antigravity（AGY CLI 1.3.3 以上）
+# Antigravity (AGY CLI 1.3.3 or later)
 agy plugin install https://github.com/neko3cs/dev-process-kit/plugins/dev-process-kit
 ```
 
-スキルの呼び出し方はハーネスによって違います。
+How you invoke a skill depends on the harness.
 
-| ハーネス | 呼び出し例 |
+| Harness | Example |
 | :--- | :--- |
-| Claude Code、GitHub Copilot CLI | `/dev-process-kit:issue` |
+| Claude Code, GitHub Copilot CLI | `/dev-process-kit:issue` |
 | Codex | `$dev-process-kit:issue` |
 
-以降の例は Claude Code の書き方で示します。名前で呼び出すほか、「Issue を作って」「#12 を設計して」のような依頼からスキルが選ばれることもあります。
+The examples below use the Claude Code form. Besides calling a skill by name, a request such as "create an issue" or "design #12" may also select the skill.
 
-## 2. 要望を Issue に起票する
+## 2. File the request as an Issue
 
-作りたいものを、そのまま伝えます。
+Describe what you want, as it is.
 
 ```text
-/dev-process-kit:issue タスクの期限が過ぎたら、一覧で分かるようにしたい
+/dev-process-kit:issue Make overdue tasks stand out in the task list
 ```
 
-`dev-process-kit:issue` は、リポジトリの Issue テンプレートに従って Issue を作ります。テンプレートが無ければ、説明・動機と背景・受け入れ条件の見出しで書きます。決まっていない部分は `仮定:` として理由と一緒に書き、確認のために止まりません。
+`dev-process-kit:issue` creates the Issue following the repository's Issue templates. Without a template, it writes the body under three headings: a description, the motivation and background, and the acceptance criteria. Anything undecided is written as an assumption with its reason, and the skill does not stop to ask.
 
-作られた Issue の番号（ここでは #12 とします）を次の工程で使います。
+You use the number of the new Issue (#12 here) in the next phase.
 
-## 3. 設計 PR を作る
+## 3. Open a design PR
 
 ```text
 /dev-process-kit:design 12
 ```
 
-`dev-process-kit:design` は Issue を読み、`requirements.md`・`specification.md`・`architecture.md` を作成または更新して、設計文書だけの設計 PR を作ります。設計文書が無いリポジトリでは、テンプレートから3つの文書を新しく作ります。
+`dev-process-kit:design` reads the Issue, creates or updates `requirements.md`, `specification.md`, and `architecture.md`, and opens a design PR that contains only design documents. In a repository with no design documents yet, it creates all three from templates.
 
-決まっていない箇所は `仮定（未承認）:` として仮案で書かれ、設計 PR のコメントで採否を質問されます。
+Undecided points are written as provisional proposals marked as unapproved assumptions, and the skill asks in design PR comments whether to adopt them.
 
-## 4. 設計 PR をレビューしてマージする（人の作業）
+## 4. Review and merge the design PR (your part)
 
-設計 PR を読み、質問コメントに答えます。直してほしい点があれば、レビューコメントを付けて `dev-process-kit:design` にもう一度頼みます。
+Read the design PR and answer the question comments. If something needs changing, leave review comments and ask `dev-process-kit:design` again.
 
 ```text
-設計PRのレビューを反映して
+Address the review comments on the design PR
 ```
 
-内容に納得したら、設計 PR をマージします。**このマージで仕様が合意され、凍結されます。**
+When you are satisfied, merge the design PR. **This merge means the specification is agreed and frozen.**
 
-## 5. 実装 PR を作る
+## 5. Open an implementation PR
 
 ```text
 /dev-process-kit:implement 12
 ```
 
-`dev-process-kit:implement` は、マージ済みの設計文書をもとに実装とテストを書き、Issue 1つにつき1つの実装 PR を作ります。PR 本文には `Closes #12` と、受け入れ基準ごとに対応するテストが書かれます。
+`dev-process-kit:implement` writes the implementation and tests from the merged design documents and opens one implementation PR per Issue. The PR body contains `Closes #12` and the tests that correspond to each acceptance criterion.
 
-実装の途中で設計の不足や誤りが見つかると、`dev-process-kit:implement` は実装を止めます。実装 PR を Draft にし、別の設計 PR で設計を直します。その設計 PR をレビューしてマージしてから、もう一度 `/dev-process-kit:implement 12` を実行すると、実装が再開されます。
+If a gap or an error in the design turns up during implementation, `dev-process-kit:implement` stops. It turns the implementation PR into a Draft and fixes the design in a separate design PR. Once you review and merge that design PR, run `/dev-process-kit:implement 12` again to resume the implementation.
 
-## 6. 受け入れテストをして、実装 PR をマージする（人の作業）
+## 6. Run acceptance tests and merge the implementation PR (your part)
 
-`requirements.md` の受け入れ基準に照らして受け入れテストをし、GO / NO-GO を判断します。
+Run acceptance tests against the acceptance criteria in `requirements.md` and decide GO / NO-GO.
 
-- **NO-GO**: 実装 PR にレビューコメントを付け、`dev-process-kit:implement` に対応を頼みます（「PR #13 のレビューに対応して」など）。
-- **GO**: 実装 PR をレビューしてマージします。マージで Issue #12 が完了します。
+- **NO-GO**: Leave review comments on the implementation PR and ask `dev-process-kit:implement` to address them (for example, "address the review on PR #13").
+- **GO**: Review and merge the implementation PR. The merge completes Issue #12.
 
-## バグを直すとき
+## Fixing bugs
 
-正しい動作がすでに設計文書に書かれているバグは、設計を経ずに Issue を起票してから `dev-process-kit:implement` で直せます。設計文書と食い違うコードは、コードの不具合として扱われます。
+For a bug whose correct behavior is already written in the design documents, file an Issue and fix it with `dev-process-kit:implement`, without going through design. Code that disagrees with the design documents is treated as a defect in the code.
 
-## 次に読む
+## Read next
 
-- [dev-process-kit の思想](philosophy.md) — なぜこの工程で進めるのか
-- [スキルリファレンス](skills.md) — 各スキルが何を読み、何を作り、何をしないか
+- [Philosophy](philosophy.md) — why the work follows these phases
+- [Skill reference](skills.md) — what each skill reads, produces, and does not do

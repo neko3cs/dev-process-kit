@@ -1,107 +1,109 @@
-# スキルリファレンス
+# Skill reference
 
-dev-process-kit の3つのスキルが、何を読み、何を作り、何をしないかをまとめます。手順の詳細と判断基準は、各スキルの `SKILL.md` が正本です。
+English | [日本語](skills.ja.md)
 
-| スキル | 工程 | 読むもの | 作るもの |
+This page summarizes what the three dev-process-kit skills read, produce, and do not do. Each skill's `SKILL.md` is the authoritative source for the detailed steps and decision criteria. The skill files are written in Japanese.
+
+| Skill | Phase | Reads | Produces |
 | :--- | :--- | :--- | :--- |
-| [`dev-process-kit:issue`](#dev-process-kitissue) | 起票 | 利用者の要望、Issue テンプレート | GitHub Issue、Issue コメント |
-| [`dev-process-kit:design`](#dev-process-kitdesign) | 設計 | Issue、既存の設計文書、コード | 3つの設計文書、設計 PR、質問コメント |
-| [`dev-process-kit:implement`](#dev-process-kitimplement) | 実装 | Issue、マージ済みの設計文書と設計 PR | プロダクトコード、テストコード、実装 PR |
+| [`dev-process-kit:issue`](#dev-process-kitissue) | File | The user's request, Issue templates | GitHub Issue, Issue comments |
+| [`dev-process-kit:design`](#dev-process-kitdesign) | Design | Issue, existing design documents, code | Three design documents, design PR, question comments |
+| [`dev-process-kit:implement`](#dev-process-kitimplement) | Implementation | Issue, merged design documents and design PRs | Product code, test code, implementation PR |
 
-どのスキルも、PR の書式・ブランチ名・テストフレームワーク・品質ゲートの方法は決めません。リポジトリの規約、テンプレート、利用者の指示に従います。
+None of the skills decide PR format, branch names, test frameworks, or how to run quality gates. They follow the repository's conventions and templates and the user's instructions.
 
 ## `dev-process-kit:issue`
 
-要望を GitHub Issue に起票します。正本: [`skills/issue/SKILL.md`](../plugins/dev-process-kit/skills/issue/SKILL.md)
+Files a request as a GitHub Issue. Source: [`skills/issue/SKILL.md`](../plugins/dev-process-kit/skills/issue/SKILL.md)
 
-### 使う場面
+### When to use
 
-- 機能要望やバグ報告を Issue にしたいとき
-- 既存の Issue に、背景・調査結果・議論の経緯をコメントとして残したいとき
+- To turn a feature request or a bug report into an Issue
+- To record background, investigation results, or the course of a discussion as a comment on an existing Issue
 
 ```text
-/dev-process-kit:issue ログイン画面がクラッシュする
+/dev-process-kit:issue The login screen crashes
 ```
 
-### 動き
+### What it does
 
-- 起票のたびに、対象リポジトリの `.github/ISSUE_TEMPLATE/` を読み直します。無ければ、所有者の `.github` リポジトリのテンプレートを使います。どちらにも無ければ、説明・動機と背景・受け入れ条件の見出しで書きます。
-- 必須フィールドは必ず埋めます。決まっていない要望は `仮定: <内容>` と理由を添えて書き、確認のために起票を止めません。
-- 再現結果・環境・実測値などの事実は創作せず、未確認と書きます。
-- 本文には要望を書き、長い調査結果や経緯はコメントに分けます。同じ話題のコメントは、足さずに書き換えます。
+- Re-reads the target repository's `.github/ISSUE_TEMPLATE/` every time it files an Issue. If there is none, it uses the templates in the owner's `.github` repository. If neither exists, it writes the body under three headings: a description, the motivation and background, and the acceptance criteria.
+- Always fills in required fields. An undecided part of the request is written as an assumption (marked `仮定:`) with its reason; the skill does not stop filing to ask.
+- Does not invent facts such as reproduction results, environments, or measurements; it marks them as unconfirmed.
+- Puts the request in the body and moves long investigation results and history into comments. A comment on the same topic is rewritten rather than followed by a new one.
 
-### しないこと
+### What it does not do
 
-- 何を作るかの合意や、受け入れ基準の作り込み（`dev-process-kit:design` で行う）
-- 起票に続けて設計・実装・PR 作成を始めること
+- Settle what to build or work out the acceptance criteria (that happens in `dev-process-kit:design`)
+- Go on to design, implementation, or PR creation after filing
 
 ## `dev-process-kit:design`
 
-Issue を3つの設計文書に設計し、設計 PR を作ります。正本: [`skills/design/SKILL.md`](../plugins/dev-process-kit/skills/design/SKILL.md)、判断基準: [`references/policy.md`](../plugins/dev-process-kit/skills/design/references/policy.md)
+Designs an Issue into three design documents and opens a design PR. Source: [`skills/design/SKILL.md`](../plugins/dev-process-kit/skills/design/SKILL.md); decision criteria: [`references/policy.md`](../plugins/dev-process-kit/skills/design/references/policy.md)
 
-### 使う場面
+### When to use
 
-- Issue を設計したいとき（`/dev-process-kit:design 12`、「#12 を設計して」）
-- 設計 PR のレビュー指摘を反映したいとき
-- 仕様変更を設計文書に反映したいとき
+- To design an Issue (`/dev-process-kit:design 12`, "design #12")
+- To address review comments on a design PR
+- To reflect a specification change in the design documents
 
-### 作る文書
+### Documents it produces
 
-| 文書 | 答える問い | 主な内容 |
+| Document | Question it answers | Main contents |
 | :--- | :--- | :--- |
-| `requirements.md` | なぜ、誰のために、何を達成するか | 目的、利用者、利用シナリオ、業務要件、機能要件と受け入れ基準、非機能目標、対象外、用語 |
-| `specification.md` | どの条件で、何が起きるべきか | 業務ルール（入力と期待結果の表）、画面操作、状態、データの意味と制約、入出力形式、エラー・通知 |
-| `architecture.md` | どの構造・制約で実現するか、なぜか | 構成と依存、設計判断（ADR）、永続化・移行、共通実装規約、非機能の実現方式、検証方針と重点リスク |
+| `requirements.md` | Why, for whom, and what to achieve | Purpose, users, usage scenarios, business requirements, functional requirements and acceptance criteria, non-functional targets, out of scope, glossary |
+| `specification.md` | What should happen under which conditions | Business rules (tables of inputs and expected results), screen operations, states, meaning and constraints of data, input/output formats, errors and notifications |
+| `architecture.md` | Which structure and constraints realize it, and why | Structure and dependencies, design decisions (ADRs), persistence and migration, shared implementation conventions, how non-functional targets are met, verification policy and key risks |
 
-文書の置き場所は、既存の規約を優先します。指定がなければ既存の `docs/` の中、無ければリポジトリ直下に置きます。
+Existing conventions decide where the documents live. Without one, they go under an existing `docs/` directory, or at the repository root if there is none.
 
-### 動き
+### What it does
 
-- 3つの文書が1つも無ければテンプレートから新しく作り、あれば該当する節だけを差分で更新します。既存の文書を丸ごと書き直すことはしません。
-- 決まっていない設計は、具体的な仮案を選んで `仮定（未承認）: <内容>` と理由を書きます。仮案の採否は、設計 PR のコメントで質問します。
-- コードと設計文書が食い違っていたら、文書を正とし、コードの不具合として報告します。
-- 作業ブランチの作成・コミット・push・設計 PR の作成までを、操作ごとの許可を求めずに進めます。設計 PR は Issue を閉じないよう `Refs #<番号>` で関連付けます。
+- If none of the three documents exist, creates them from templates; if they exist, updates only the relevant sections as a diff. It never rewrites an existing document wholesale.
+- For undecided design, picks a concrete provisional proposal and writes it as an unapproved assumption (marked `仮定（未承認）:`) with its reason. It asks in design PR comments whether to adopt each proposal.
+- When the code and the design documents disagree, treats the documents as correct and reports the difference as a defect in the code.
+- Creates the working branch, commits, pushes, and opens the design PR without asking permission for each operation. The design PR links the Issue with `Refs #<number>` so that it does not close the Issue.
 
-### しないこと
+### What it does not do
 
-- 実装（テストやプロダクトコードを書くこと）
-- テストケース・テスト手順の文書化（テストコードを正とする）
-- 実装タスク一覧（`tasks.md` など）の作成
-- 現在のコード構造（関数の一覧や内部の呼び出し順序）の転記
-- 設計 PR のマージ（人が判断する）
+- Implement (write tests or product code)
+- Document test cases or test procedures (test code is the source of truth)
+- Create an implementation task list (such as `tasks.md`)
+- Copy the current code structure (lists of functions, internal call order)
+- Merge the design PR (a person decides)
 
 ## `dev-process-kit:implement`
 
-マージ済みの設計文書をもとに、Issue 1つにつき1つの実装 PR で実装します。正本: [`skills/implement/SKILL.md`](../plugins/dev-process-kit/skills/implement/SKILL.md)
+Implements from the merged design documents, with one implementation PR per Issue. Source: [`skills/implement/SKILL.md`](../plugins/dev-process-kit/skills/implement/SKILL.md)
 
-### 使う場面
+### When to use
 
-- 設計 PR がマージされた Issue を実装したいとき（`/dev-process-kit:implement 12`）
-- 正しい動作がすでに設計文書に書かれているバグを直したいとき
-- 実装 PR のレビュー指摘に対応したいとき
+- To implement an Issue whose design PR has been merged (`/dev-process-kit:implement 12`)
+- To fix a bug whose correct behavior is already written in the design documents
+- To address review comments on an implementation PR
 
-### 動き
+### What it does
 
-- Issue と、関連する設計 PR の差分を読み、設計文書と照らして作業範囲を決めます。
-- 設計文書が無い、Issue の内容が設計文書に書かれていない、作業範囲に `TBD` が残っている、のどれかに当たれば実装を始めません。設計 PR を作るか、未マージの設計 PR のマージを待ちます。
-- 設計文書ごとに、次のレベルのテストを書きます。
+- Reads the Issue and the diff of the related design PRs, and decides the scope of work by matching them against the design documents.
+- Does not start implementing if there are no design documents, if the Issue's content is not in the design documents, or if `TBD` remains in the scope. Instead, it opens a design PR or waits for an unmerged design PR to be merged.
+- Writes tests at the following level for each design document.
 
-  | 設計文書 | テスト |
+  | Design document | Tests |
   | :--- | :--- |
-  | `requirements.md` の業務要件 | シナリオテスト |
-  | `specification.md` | インテグレーションテスト（計算規則はユニットテストでもよい） |
-  | 詳細設計（文書にしない） | ユニットテスト |
+  | Business requirements in `requirements.md` | Scenario tests |
+  | `specification.md` | Integration tests (calculation rules may use unit tests) |
+  | Detailed design (not documented) | Unit tests |
 
-  `architecture.md` の制約は、ビルドの仕組みで強制するか、PR のレビューで照合します。
-- 業務ルールの表の行は、テストのデータとしてそのまま写します。
-- 実装中に設計の不足や誤りが見つかったら、実装を止めて実装 PR を Draft にし、別の設計 PR で直します。そのマージを待ってから再開します。
-- 実装 PR の本文には、作成時から `Closes #<番号>` を書きます。受け入れ基準ごとの対応するテスト、確認済みと未確認の動作確認も書きます。
-- 人の判断を待つ事項があれば Draft のままにし、PR コメントで質問します。品質ゲートと自動チェックへの対応を終えてから Ready for review にします。
-- Ready for review の後のレビュー対応は、ひとまとまりの対応ごとに1回だけ push します。
+  Constraints in `architecture.md` are enforced by the build structure or checked in PR review.
+- Copies the rows of business rule tables directly into test data.
+- If a gap or an error in the design turns up during implementation, stops, turns the implementation PR into a Draft, and fixes the design in a separate design PR. It resumes after that PR is merged.
+- Writes `Closes #<number>` in the implementation PR body from the start. The body also lists the test for each acceptance criterion, and separates verified from unverified checks.
+- Keeps the PR in Draft and asks in PR comments while anything waits on a human decision. It marks the PR Ready for review only after the quality gates pass and automated checks are addressed.
+- After Ready for review, pushes once per batch of review fixes.
 
-### しないこと
+### What it does not do
 
-- 設計文書に書かれていない仕様を、実装 PR の中で仮に決めて実装すること
-- コードに合わせて設計文書を書き換えること
-- Issue への書き込み（Issue は読むだけ）
-- 受け入れテストの GO / NO-GO の判断と、実装 PR のマージ（人が判断する）
+- Decide on a specification that is not in the design documents and implement it inside the implementation PR
+- Rewrite the design documents to match the code
+- Write to the Issue (it only reads Issues)
+- Decide GO / NO-GO in acceptance testing, or merge the implementation PR (a person decides)

@@ -1,91 +1,93 @@
-# dev-process-kit の思想
+# Philosophy
 
-dev-process-kit は、仕様駆動開発（SDD）だけでは扱いきれない範囲まで含めて、ソフトウェア開発プロセス全体を支援するために作りました。下敷きにしているのは、日本のソフトウェア開発で広く使われてきたウォーターフォール型の開発プロセスです。
+English | [日本語](philosophy.ja.md)
 
-## SDD より広い範囲を扱う
+dev-process-kit was built to support the whole software development process, including the parts that spec-driven development (SDD) alone does not cover. It is modeled on the waterfall process that has long been common in Japanese software development: work moves through defined phases, each phase produces documents that are reviewed and signed off, and a change found downstream goes back to the phase it belongs to.
 
-SDD は、仕様を先に書き、その仕様からコードを作ることに重心を置いています。実際の開発では、その前後にも工程があります。
+## Wider than SDD
 
-- 仕様を書く前に、何が求められているのか（要件）をはっきりさせる
-- 仕様を人が合意し、それ以降は勝手に変えない
-- 実装中に仕様の問題が見つかったら、上流の工程に戻って直す
-- 出来上がったものが業務で使えるかを、人が受け入れテストで判断する
+SDD centers on writing the specification first and producing code from it. Real development has phases before and after that.
 
-dev-process-kit は、要件定義から受け入れテストまでをひと続きの工程として扱います。工程の区切りごとに人のレビューとマージを置き、AI が進める作業と人が判断する作業を分けます。
+- Before writing the specification, make clear what is actually required (the requirements).
+- Have people agree on the specification, and do not change it unilaterally afterward.
+- When a problem with the specification turns up during implementation, go back upstream to fix it.
+- Have people judge, through acceptance testing, whether the result works for the business.
 
-## ウォーターフォールの工程に沿って進める
+dev-process-kit treats everything from requirements definition to acceptance testing as one continuous process. It puts a human review and merge at each phase boundary, separating the work the AI carries out from the decisions people make.
 
-工程は、上流から下流へ一方向に進みます。
+## Follow the waterfall phases
 
-| 工程 | 成果物 | スキル | 区切り |
+The phases move in one direction, from upstream to downstream.
+
+| Phase | Deliverables | Skill | Boundary |
 | :--- | :--- | :--- | :--- |
-| 要件定義 | Issue、要件定義書（`requirements.md`） | `dev-process-kit:issue`、`dev-process-kit:design` | — |
-| 設計 | 仕様書（`specification.md`）、アーキテクチャ設計書（`architecture.md`） | `dev-process-kit:design` | 設計 PR のマージで仕様を凍結する |
-| 実装とテスト | プロダクトコード、テストコード | `dev-process-kit:implement` | — |
-| 受け入れテスト | GO / NO-GO の判断 | — （人が行う） | 実装 PR のマージで Issue が完了する |
+| Requirements definition | Issue, requirements document (`requirements.md`) | `dev-process-kit:issue`, `dev-process-kit:design` | — |
+| Design | Specification (`specification.md`), architecture document (`architecture.md`) | `dev-process-kit:design` | Merging the design PR freezes the specification |
+| Implementation and testing | Product code, test code | `dev-process-kit:implement` | — |
+| Acceptance testing | GO / NO-GO decision | — (done by a person) | Merging the implementation PR completes the Issue |
 
-### 要件定義は Issue から始める
+### Requirements definition starts from an Issue
 
-開発の起点は Issue です。要望はすべて Issue として起票し、Issue で管理します。何を作るかが Issue に残っていれば、会話の履歴を持たない人や AI も後から同じところから始められます。
+Development starts from an Issue. Every request is filed and tracked as an Issue. When what to build is recorded in an Issue, people and AI without the conversation history can later pick up from the same place.
 
-Issue に書くのは要望までです。要望がまだ固まっていない部分は、仮定として明記して先に進みます。何を作るかの合意と受け入れ基準は、要件定義書（`requirements.md`）にまとめます。要件定義書は仕様書・アーキテクチャ設計書と同じ設計 PR で作り、そのマージで一緒に合意します。
+An Issue holds only the request. Parts of the request that are not settled yet are stated as assumptions, and work moves on. The agreement on what to build and the acceptance criteria go into the requirements document (`requirements.md`). The requirements document is written in the same design PR as the specification and the architecture document, and all three are agreed together when that PR is merged.
 
-### 設計では、要件から「あるべき仕様」を決める
+### Design defines the specification the requirements call for
 
-要件が固まってから設計に入ります。設計では、要件を満たすためにシステムやアプリがどう振る舞うべきかを定義し、次の3つの文書にまとめます。
+Design starts once the requirements are settled. It defines how the system or app should behave to meet the requirements, and records this in three documents.
 
-| 文書 | 答える問い |
+| Document | Question it answers |
 | :--- | :--- |
-| 要件定義書（`requirements.md`） | なぜ、誰のために、何を達成するか |
-| 仕様書（`specification.md`） | どの条件で、何が起きるべきか |
-| アーキテクチャ設計書（`architecture.md`） | どの構造・制約で実現するか、なぜそうするか |
+| Requirements document (`requirements.md`) | Why, for whom, and what to achieve |
+| Specification (`specification.md`) | What should happen under which conditions |
+| Architecture document (`architecture.md`) | Which structure and constraints realize it, and why |
 
-設計文書は、現在のコードを写したものではありません。人が決めた約束と、その判断の理由を残すものです。決まっていない箇所は AI が仮案で書き、設計 PR のコメントで人に採否を問います。
+Design documents are not a copy of the current code. They record the commitments people made and the reasons behind those decisions. Where something is undecided, the AI writes a provisional proposal and asks people in design PR comments whether to adopt it.
 
-### 設計 PR のマージで仕様を凍結する
+### Merging the design PR freezes the specification
 
-人が設計 PR をレビューしてマージすると、仕様が合意され、凍結されます。実装は、凍結された仕様だけをもとに行います。
+When a person reviews and merges the design PR, the specification is agreed and frozen. Implementation works only from the frozen specification.
 
-コードと設計文書が食い違ったときは、設計文書を正とし、コードの不具合として扱います。利用者が確かめるのは文書で、コードではないからです。
+When the code and the design documents disagree, the design documents win, and the difference is treated as a defect in the code. Users check the documents, not the code.
 
-### 仕様が変わったら、実装を止めて上流に戻る
+### When the specification changes, stop and go back upstream
 
-実装の途中で仕様の不足や誤りが見つかっても、実装 PR の中で仮の仕様を決めて先に進むことはしません。実装を止め、別の設計 PR で仕様を直します。その設計 PR がマージされ、仕様が凍結し直されてから実装に戻ります。
+If a gap or an error in the specification turns up during implementation, the implementation PR does not settle on a provisional specification and carry on. Implementation stops, and the specification is fixed in a separate design PR. Implementation resumes only after that design PR is merged and the specification is frozen again.
 
-この手戻りは、ウォーターフォールで仕様変更を上流工程に差し戻すのと同じ考え方です。AI が実装の都合で仕様を書き換えたことにしないための決まりでもあります。
+This rework follows the same idea as sending a specification change back to an upstream phase in waterfall. It is also the rule that keeps the AI from rewriting the specification for the convenience of the implementation.
 
-### Issue 1つにつき、実装 PR は1つ
+### One implementation PR per Issue
 
-実装 PR は Issue 1つにつき1つ作ります。人の判断を待つ事項が残っているあいだは Draft のままにし、マージされる時点で Issue が完了している状態を保ちます。
+Each Issue gets exactly one implementation PR. While anything still waits on a human decision, the PR stays in Draft, so that by the time it is merged, the Issue is complete.
 
-## テストはテストコードで定義する
+## Tests are defined in test code
 
-テストケースやテスト手順は文書にせず、テストコードで定義します。テストは実装と一緒に書きます。テストの仕様をできるだけコードに落とし込んでおけば、変更のたびに同じテストを回帰テストとして流せます。
+Test cases and test procedures are not written as documents; they are defined in test code. Tests are written together with the implementation. Putting as much of the test specification into code as possible lets the same tests run as regression tests on every change.
 
-どの設計文書をどのレベルのテストで確かめるかは、このプラグインが決めています。設計の段階ごとに、それを確かめる検証を対にして置く考え方です。
+This plugin decides which design document is verified at which level of testing. Each design level is paired with the verification that checks it.
 
-| 設計 | 検証 |
+| Design | Verification |
 | :--- | :--- |
-| 要件定義書の業務要件 | シナリオテスト（システムが担う部分）と受け入れテスト（人を含む業務全体） |
-| 要件定義書の非機能要件 | 非機能要件の目標を合否条件とする検証 |
-| 仕様書 | インテグレーションテスト |
-| アーキテクチャ設計書 | 構造による強制とレビュー |
-| 詳細設計（文書にしない） | ユニットテスト |
+| Business requirements in the requirements document | Scenario tests (the part the system handles) and acceptance tests (the whole business process, people included) |
+| Non-functional requirements in the requirements document | Verification that uses the non-functional targets as pass/fail criteria |
+| Specification | Integration tests |
+| Architecture document | Structural enforcement and review |
+| Detailed design (not documented) | Unit tests |
 
-- 詳細設計は文書にしません。コードの写しになり、保守できなくなるためです。代わりに、ユニットテストを仕様として読めるように書きます。
-- 仕様書の業務ルールは、入力と期待結果の表で書きます。テストはこの表の行をそのまま写して書くので、人は表とテストを見比べて確かめられます。
-- 受け入れテストの実行や証拠集めは AI に任せられますが、GO / NO-GO は人が判断します。
+- Detailed design is not documented, because it would become a copy of the code that nobody can maintain. Instead, unit tests are written so they read as a specification.
+- Business rules in the specification are written as tables of inputs and expected results. Tests copy the rows of these tables directly, so people can check the tests against the tables.
+- The AI can run acceptance tests and collect evidence, but people decide GO / NO-GO.
 
-## このプラグインが決めること、決めないこと
+## What this plugin decides, and what it leaves to you
 
-工程の流れと、その流れを守るための決まりは、このプラグインが決めます。利用者ごとに変えられる「やり方の好み」としては扱いません。
+This plugin decides the flow of the phases and the rules that keep the flow intact. They are not treated as a matter of personal preference that each user can change.
 
-| このプラグインが決めること | リポジトリの規約と利用者の指示に任せること |
+| Decided by this plugin | Left to the repository's conventions and the user's instructions |
 | :--- | :--- |
-| 要望は Issue に起票する | Issue テンプレートの構成 |
-| 設計は3つの設計文書にまとめる | 設計文書の置き場所（既存の規約があれば従う） |
-| 設計 PR のマージで仕様を凍結する | PR の書式とテンプレート |
-| Issue 1つにつき実装 PR は1つ | ブランチ名と作り方 |
-| 判断待ちのあいだは Draft のままにする | 実装の進め方 |
-| 実装中に見つかった設計の問題は、別の設計 PR で直す | テストフレームワークやツール |
-| 設計文書と検証レベルの対応 | 品質ゲートの方法 |
+| Requests are filed as Issues | How Issue templates are structured |
+| Design is recorded in three design documents | Where the design documents live (existing conventions win) |
+| Merging the design PR freezes the specification | PR format and templates |
+| One implementation PR per Issue | Branch names and how branches are created |
+| The PR stays in Draft while a decision is pending | How implementation is carried out |
+| Design problems found during implementation are fixed in a separate design PR | Test frameworks and tools |
+| Which design document is verified at which level | How quality gates are run |
