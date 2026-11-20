@@ -47,7 +47,7 @@ flowchart TD
 | :--- | :--- | :--- |
 | Claude Code | `.claude-plugin/marketplace.json` | `plugins/dev-process-kit/.claude-plugin/plugin.json` |
 | Codex | `.agents/plugins/marketplace.json` | `plugins/dev-process-kit/.codex-plugin/plugin.json` |
-| GitHub Copilot CLI | `.claude-plugin/marketplace.json` | `plugins/dev-process-kit/plugin.json` |
+| GitHub Copilot CLI | `.github/plugin/marketplace.json` | `plugins/dev-process-kit/plugin.json` |
 | Antigravity | — | `plugins/dev-process-kit/plugin.json` |
 
 GitHub Copilot CLI では、プロジェクトや個人のスキルに `issue`・`design`・`implement` と同じ名前のものがあると、このプラグインのスキルは警告なしに使われなくなります。
