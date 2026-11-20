@@ -13,7 +13,6 @@ AI コーディングエージェント向けの開発プロセス系スキル�
 | `issue` | 要望を GitHub Issue に起票する。リポジトリの Issue テンプレートがあれば従う |
 | `design` | Issue を `requirements.md`・`specification.md`・`architecture.md` の3文書に設計し、設計 PR を作る |
 | `implement` | マージ済みの設計文書をもとに、Issue 1つにつき1つの実装 PR で実装する |
-| `hello` | 導入確認用。決まった1行を返す |
 
 どの設計文書をどのレベルの検証で確かめるか（業務要件はシナリオテストと受け入れテスト、仕様はインテグレーションテスト、アーキテクチャは構造による強制とレビュー、詳細設計はユニットテスト）という対応は、このプラグインが決めます。PR の書式、実装の進め方、テストフレームワークやツール、品質ゲートの方法は決めません。リポジトリの規約と利用者の指示に従います。
 
@@ -37,11 +36,7 @@ AI コーディングエージェント向けの開発プロセス系スキル�
 /plugin install dev-process-kit@dev-process-kit
 ```
 
-導入後に Claude Code を再起動し、次を実行します。
-
-```text
-/dev-process-kit:hello
-```
+導入後に Claude Code を再起動すると、`/dev-process-kit:issue` などのスキルを呼び出せます。
 
 ### Codex
 
@@ -50,19 +45,9 @@ codex plugin marketplace add neko3cs/dev-process-kit
 codex plugin add dev-process-kit@dev-process-kit
 ```
 
-デスクトップアプリの場合は、マーケットプレイスを追加したあとに Plugins Directory から `dev-process-kit` を導入できます。導入後は新しいセッションで次を実行します。
+デスクトップアプリの場合は、マーケットプレイスを追加したあとに Plugins Directory から `dev-process-kit` を導入できます。導入後は新しいセッションで `$dev-process-kit:issue` などのスキルを呼び出せます。
 
-```text
-$dev-process-kit:hello
-```
-
-Codex ではスキルを `$` で呼び出します。Claude Code の `/dev-process-kit:hello` とは先頭の記号が違います。
-
-### 期待される応答
-
-```text
-dev-process-kit is installed. (hello from dev-process-kit)
-```
+Codex ではスキルを `$` で呼び出します。Claude Code の `/dev-process-kit:issue` とは先頭の記号が違います。
 
 ## 更新
 
@@ -87,8 +72,7 @@ codex plugin marketplace upgrade dev-process-kit
     └── skills/                          # 両ハーネス共通のスキル
         ├── issue/
         ├── design/
-        ├── implement/
-        └── hello/
+        └── implement/
 ```
 
 ## ライセンス
