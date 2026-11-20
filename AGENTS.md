@@ -7,6 +7,7 @@
 - Skills must not reference anything outside this plugin: other skills (such as `create-pullrequest`, `test-as-tdd`, `test-code`) or author-specific templates (such as `neko3cs/.github`). Do not replace such a reference with a hint at a specific method or an instruction to look for related skills either; that still steers how users work. Leave PR format, implementation technique, and testing to the user's repository rules and instructions.
 - Refer to skills inside this plugin by their namespaced name (`dev-process-kit:design`, not `design`). Users may also have same-name skills from neko3cs/skills installed. GitHub Copilot CLI lists plugin skills without the namespace, and a same-name project or personal skill silently hides the plugin's skill; `/dev-process-kit:design` then does not reach the plugin's `design` (verified on 1.0.114).
 - Do not hand the process core over to users as "their own method": a merged design PR freezes the spec, one implementation PR per Issue, pending decisions stay in Draft, and design changes found during implementation go to a separate design PR. The owner explicitly rejected treating these as user-specific.
+- `README.md` and `docs/*.md` are written in English and are the source of truth; their Japanese versions are `README.ja.md` and `docs/*.ja.md`. When you change a page in either language, update the other language in the same PR. This intentionally overrides the global instruction that `README.md` must be Japanese: the owner chose English as the source for this repository.
 
 ## Implicit Constraints
 
