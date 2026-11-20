@@ -6,14 +6,6 @@ AI コーディングエージェント向けの開発プロセス系スキル�
 
 仕様駆動開発（SDD）より広く、要件定義から受け入れテストまでのソフトウェア開発プロセスを支援します。日本のウォーターフォール開発を下敷きに、要望を Issue で管理し、設計 PR のマージで仕様を凍結してから実装に入ります。実装中に仕様の問題が見つかれば、上流の設計に戻って直します。
 
-## ドキュメント
-
-| ドキュメント | 内容 |
-| :--- | :--- |
-| [Getting Started](docs/getting-started.md) | 導入から、1つの要望を Issue → 設計 PR → 実装 PR まで通す流れ |
-| [dev-process-kit の思想](docs/philosophy.md) | なぜウォーターフォールの工程で進めるのか、このプラグインが決めること・決めないこと |
-| [スキルリファレンス](docs/skills.md) | `issue`・`design`・`implement` が何を読み、何を作り、何をしないか |
-
 ## スキル
 
 要望を Issue に記録し、設計文書で仕様を合意してから、Issue ごとに1つの PR で実装する、という流れを3つのスキルで進めます。
@@ -94,6 +86,14 @@ codex plugin marketplace upgrade dev-process-kit
 # GitHub Copilot CLI
 copilot plugin update dev-process-kit
 ```
+
+## ドキュメント
+
+| ドキュメント | 内容 |
+| :--- | :--- |
+| [Getting Started](docs/getting-started.md) | 導入から、1つの要望を Issue → 設計 PR → 実装 PR まで通す流れ |
+| [dev-process-kit の思想](docs/philosophy.md) | なぜウォーターフォールの工程で進めるのか、このプラグインが決めること・決めないこと |
+| [スキルリファレンス](docs/skills.md) | `issue`・`design`・`implement` が何を読み、何を作り、何をしないか |
 
 ## ライセンス
 
