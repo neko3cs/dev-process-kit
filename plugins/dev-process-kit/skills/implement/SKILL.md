@@ -1,6 +1,6 @@
 ---
 name: implement
-description: Implement a GitHub issue from requirements.md, specification.md, and architecture.md on one implementation PR. Scope work by matching the issue and design PR changes to the design docs, implement and verify against the design docs, mark ready for review, and address implementation PR reviews. Commit, push, and create or update the PR without per-operation approval. When the design is missing, undecided, or wrong, do not implement on assumptions; stop and get the design fixed in a separate design PR, then resume after it is merged (if the user does not want design docs, ask in chat instead). Use for "/dev-process-kit:implement 4", "$dev-process-kit:implement 4", "implement issue #4", "resolve issue #4", "fix issue #4", "#4を実装して", "#4を解決して", "#4を直して", "実装PRのレビューを反映して", or "PR #5 のレビューに対応して".
+description: Implement a GitHub issue from requirements.md, specification.md, and architecture.md on one implementation PR. Scope work by matching the issue and design PR changes to the design docs, implement and verify against the design docs, mark ready for review, and address implementation PR reviews. Commit, push, and create or update the PR without per-operation approval. When the design is missing, undecided, or wrong, do not implement on assumptions; stop and get the design fixed in a separate design PR, then resume after it is merged (if the user does not want design docs, ask in chat instead). Use for "/dev-process-kit:implement 4", "implement issue #4", "resolve issue #4", "fix issue #4", "#4を実装して", "#4を解決して", "#4を直して", "実装PRのレビューを反映して", or "PR #5 のレビューに対応して".
 license: MIT
 ---
 
@@ -21,8 +21,6 @@ license: MIT
 ```
 /dev-process-kit:implement <issue番号>
 ```
-
-Codex では `$dev-process-kit:implement <issue番号>` と書きます。
 
 ## 最初に確かめる
 

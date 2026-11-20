@@ -19,7 +19,6 @@
 ```sh
 claude plugin validate .
 claude plugin validate plugins/dev-process-kit
-claude -p "/dev-process-kit:hello" --plugin-dir plugins/dev-process-kit
 ```
 
 - When testing Codex installs, point `CODEX_HOME` at a temporary directory so that `codex plugin marketplace add` and `codex plugin add` don't write to the user's `~/.codex/config.toml`. `codex exec` cannot run slash commands; invoke skills as `$dev-process-kit:<skill>`.
