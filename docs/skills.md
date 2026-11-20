@@ -60,7 +60,7 @@ Existing conventions decide where the documents live. Without one, they go under
 ### What it does
 
 - If none of the three documents exist, creates them from templates; if they exist, updates only the relevant sections as a diff. It never rewrites an existing document wholesale.
-- For undecided design, picks a concrete provisional proposal and writes it as an unapproved assumption (marked `仮定（未承認）:`) with its reason. It asks in design PR comments whether to adopt each proposal.
+- Writes the documents as finished work. For undecided design, picks the most reasonable option and writes it as the specification with its reason, without markers such as `仮定` (assumption), `未承認` (unapproved), or `TBD`. It asks in design PR comments whether each choice is right and reflects the answers by rewriting the sections.
 - When the code and the design documents disagree, treats the documents as correct and reports the difference as a defect in the code.
 - Creates the working branch, commits, pushes, and opens the design PR without asking permission for each operation. The design PR links the Issue with `Refs #<number>` so that it does not close the Issue.
 

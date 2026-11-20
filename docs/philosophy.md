@@ -42,7 +42,7 @@ Design starts once the requirements are settled. It defines how the system or ap
 | Specification (`specification.md`) | What should happen under which conditions |
 | Architecture document (`architecture.md`) | Which structure and constraints realize it, and why |
 
-Design documents are not a copy of the current code. They record the commitments people made and the reasons behind those decisions. Where something is undecided, the AI writes a provisional proposal and asks people in design PR comments whether to adopt it.
+Design documents are not a copy of the current code. They record the commitments people made and the reasons behind those decisions. The AI writes them as finished work, not as drafts full of assumptions. Where something is undecided, it picks the most reasonable option, writes it as the specification, and asks people in design PR comments whether that choice is right.
 
 ### Merging the design PR freezes the specification
 
