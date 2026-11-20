@@ -74,7 +74,7 @@ Existing conventions decide where the documents live. Without one, they go under
 
 ## `dev-process-kit:implement`
 
-Implements from the merged design documents, with one implementation PR per Issue. Source: [`skills/implement/SKILL.md`](../plugins/dev-process-kit/skills/implement/SKILL.md)
+Implements from the merged design documents, with one implementation PR per Issue. Source: [`skills/implement/SKILL.md`](../plugins/dev-process-kit/skills/implement/SKILL.md); test-driven procedure: [`references/tdd.md`](../plugins/dev-process-kit/skills/implement/references/tdd.md)
 
 ### When to use
 
@@ -95,6 +95,8 @@ Implements from the merged design documents, with one implementation PR per Issu
   | Detailed design (not documented) | Unit tests |
 
   Constraints in `architecture.md` are enforced by the build structure or checked in PR review.
+- Writes tests at every level before the product code (TDD). With scenario and integration tests from the design documents as the outer loop and unit tests as the inner loop, it runs Red → Green → Refactor for one TODO list item at a time. For a bug fix, it first writes a failing test that reproduces the bug.
+- Writes tests so they read as a specification: in the same language as the design documents, grouped by the context of the specification, with names that include the expected result.
 - Copies the rows of business rule tables directly into test data.
 - If a gap or an error in the design turns up during implementation, stops, turns the implementation PR into a Draft, and fixes the design in a separate design PR. It resumes after that PR is merged.
 - Writes `Closes #<number>` in the implementation PR body from the start. The body also lists the test for each acceptance criterion, and separates verified from unverified checks.

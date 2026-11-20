@@ -18,7 +18,7 @@ Three skills carry the flow: record a request in an Issue, agree on the specific
 | `design` | Designs an Issue into three documents (`requirements.md`, `specification.md`, `architecture.md`) and opens a design PR |
 | `implement` | Implements from the merged design documents, with one implementation PR per Issue |
 
-This plugin decides which design document is verified at which level of testing. It does not decide PR format, how to implement, test frameworks and tools, or how to run quality gates; those follow the repository's conventions and the user's instructions. See [Philosophy](docs/philosophy.md) for details.
+This plugin decides which design document is verified at which level of testing, and that tests are written before the implementation (test-driven development, TDD). It does not decide PR format, test frameworks and tools, or how to run quality gates; those follow the repository's conventions and the user's instructions. See [Philosophy](docs/philosophy.md) for details.
 
 ## Development flow
 

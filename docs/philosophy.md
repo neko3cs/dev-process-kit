@@ -62,7 +62,15 @@ Each Issue gets exactly one implementation PR. While anything still waits on a h
 
 ## Tests are defined in test code
 
-Test cases and test procedures are not written as documents; they are defined in test code. Tests are written together with the implementation. Putting as much of the test specification into code as possible lets the same tests run as regression tests on every change.
+Test cases and test procedures are not written as documents; they are defined in test code. Putting as much of the test specification into code as possible lets the same tests run as regression tests on every change.
+
+### Tests come before the implementation
+
+At every level, tests are written before the implementation (test-driven development, TDD). Scenario tests and integration tests are written first from the design documents and confirmed to fail; then the parts needed to pass them are built through the Red → Green → Refactor cycle of unit tests. This plugin defines the procedure down to splitting work into a TODO list and the three strategies for getting a test to pass (fake it, obvious implementation, and triangulation).
+
+The procedure is fixed so that quality does not vary from session to session. The idea of building downstream from what was decided upstream also applies between tests and code: writing the unit tests that stand in for detailed design first keeps detailed design ahead of implementation.
+
+### Which design document each test level verifies
 
 This plugin decides which design document is verified at which level of testing. Each design level is paired with the verification that checks it.
 
@@ -74,7 +82,7 @@ This plugin decides which design document is verified at which level of testing.
 | Architecture document | Structural enforcement and review |
 | Detailed design (not documented) | Unit tests |
 
-- Detailed design is not documented, because it would become a copy of the code that nobody can maintain. Instead, unit tests are written so they read as a specification.
+- Detailed design is not documented, because it would become a copy of the code that nobody can maintain. Instead, unit tests are written before the implementation so they read as a specification.
 - Business rules in the specification are written as tables of inputs and expected results. Tests copy the rows of these tables directly, so people can check the tests against the tables.
 - The AI can run acceptance tests and collect evidence, but people decide GO / NO-GO.
 
@@ -88,6 +96,7 @@ This plugin decides the flow of the phases and the rules that keep the flow inta
 | Design is recorded in three design documents | Where the design documents live (existing conventions win) |
 | Merging the design PR freezes the specification | PR format and templates |
 | One implementation PR per Issue | Branch names and how branches are created |
-| The PR stays in Draft while a decision is pending | How implementation is carried out |
+| The PR stays in Draft while a decision is pending | Coding conventions |
 | Design problems found during implementation are fixed in a separate design PR | Test frameworks and tools |
 | Which design document is verified at which level | How quality gates are run |
+| The procedure for writing tests before the implementation (TDD) | Detailed conventions for writing tests, such as test names |

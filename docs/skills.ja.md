@@ -74,7 +74,7 @@ Issue を3つの設計文書に設計し、設計 PR を作ります。正本: [
 
 ## `dev-process-kit:implement`
 
-マージ済みの設計文書をもとに、Issue 1つにつき1つの実装 PR で実装します。正本: [`skills/implement/SKILL.md`](../plugins/dev-process-kit/skills/implement/SKILL.md)
+マージ済みの設計文書をもとに、Issue 1つにつき1つの実装 PR で実装します。正本: [`skills/implement/SKILL.md`](../plugins/dev-process-kit/skills/implement/SKILL.md)、テスト駆動の手順: [`references/tdd.md`](../plugins/dev-process-kit/skills/implement/references/tdd.md)
 
 ### 使う場面
 
@@ -95,6 +95,8 @@ Issue を3つの設計文書に設計し、設計 PR を作ります。正本: [
   | 詳細設計（文書にしない） | ユニットテスト |
 
   `architecture.md` の制約は、ビルドの仕組みで強制するか、PR のレビューで照合します。
+- どのレベルのテストも、プロダクトコードより先に書きます（TDD）。設計文書から起こすシナリオテストとインテグレーションテストを外側、ユニットテストを内側にして、TODO リストの1項目ずつ Red → Green → Refactor を回します。バグ修正では、まず不具合を再現する失敗するテストを書きます。
+- テストは設計文書と同じ言葉で、仕様の文脈ごとにまとめ、期待結果まで含む名前を付けて、仕様として読めるように書きます。
 - 業務ルールの表の行は、テストのデータとしてそのまま写します。
 - 実装中に設計の不足や誤りが見つかったら、実装を止めて実装 PR を Draft にし、別の設計 PR で直します。そのマージを待ってから再開します。
 - 実装 PR の本文には、作成時から `Closes #<番号>` を書きます。受け入れ基準ごとの対応するテスト、確認済みと未確認の動作確認も書きます。
