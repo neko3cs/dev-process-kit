@@ -18,12 +18,12 @@ AI コーディングエージェント向けの開発プロセス系スキル�
 
 ## 対応ハーネス
 
-| ハーネス | マーケットプレイス定義 | プラグインマニフェスト | スキル呼び出し |
-| :--- | :--- | :--- | :--- |
-| Claude Code | `.claude-plugin/marketplace.json` | `plugins/dev-process-kit/.claude-plugin/plugin.json` | `/dev-process-kit:<スキル名>` |
-| Codex | `.agents/plugins/marketplace.json` | `plugins/dev-process-kit/.codex-plugin/plugin.json` | `$dev-process-kit:<スキル名>` |
+| ハーネス | マーケットプレイス定義 | プラグインマニフェスト |
+| :--- | :--- | :--- |
+| Claude Code | `.claude-plugin/marketplace.json` | `plugins/dev-process-kit/.claude-plugin/plugin.json` |
+| Codex | `.agents/plugins/marketplace.json` | `plugins/dev-process-kit/.codex-plugin/plugin.json` |
 
-スキル名には `dev-process-kit:` が付くので、同じ名前のスキルを別に入れていても取り違えません。
+スキルはどちらのハーネスでも `/dev-process-kit:<スキル名>` で呼び出せます。スキル名には `dev-process-kit:` が付くので、同じ名前のスキルを別に入れていても取り違えません。
 
 スキル本体（`plugins/dev-process-kit/skills/`）は両ハーネスで共通です。
 
@@ -45,9 +45,7 @@ codex plugin marketplace add neko3cs/dev-process-kit
 codex plugin add dev-process-kit@dev-process-kit
 ```
 
-デスクトップアプリの場合は、マーケットプレイスを追加したあとに Plugins Directory から `dev-process-kit` を導入できます。導入後は新しいセッションで `$dev-process-kit:issue` などのスキルを呼び出せます。
-
-Codex ではスキルを `$` で呼び出します。Claude Code の `/dev-process-kit:issue` とは先頭の記号が違います。
+デスクトップアプリの場合は、マーケットプレイスを追加したあとに Plugins Directory から `dev-process-kit` を導入できます。導入後は新しいセッションで `/dev-process-kit:issue` などのスキルを呼び出せます。
 
 ## 更新
 
