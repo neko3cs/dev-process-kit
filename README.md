@@ -2,7 +2,7 @@
 
 Software development process skills for AI coding agents; like a spec-driven-development.
 
-AI コーディングエージェント向けの開発プロセス系スキルをまとめたプラグインです。Claude Code と Codex にはこのリポジトリをマーケットプレイスとして追加して、Antigravity には GitHub の URL を指定して導入できます。
+AI コーディングエージェント向けの開発プロセス系スキルをまとめたプラグインです。Claude Code・Codex・GitHub Copilot CLI にはこのリポジトリをマーケットプレイスとして追加して、Antigravity には GitHub の URL を指定して導入できます。
 
 ## スキル
 
@@ -47,7 +47,10 @@ flowchart TD
 | :--- | :--- | :--- |
 | Claude Code | `.claude-plugin/marketplace.json` | `plugins/dev-process-kit/.claude-plugin/plugin.json` |
 | Codex | `.agents/plugins/marketplace.json` | `plugins/dev-process-kit/.codex-plugin/plugin.json` |
+| GitHub Copilot CLI | `.github/plugin/marketplace.json` | `plugins/dev-process-kit/plugin.json` |
 | Antigravity | — | `plugins/dev-process-kit/plugin.json` |
+
+GitHub Copilot CLI では、プロジェクトや個人のスキルに `issue`・`design`・`implement` と同じ名前のものがあると、このプラグインのスキルは警告なしに使われなくなります。
 
 ## 導入方法
 
@@ -59,6 +62,10 @@ claude plugin install dev-process-kit@dev-process-kit
 # Codex
 codex plugin marketplace add neko3cs/dev-process-kit
 codex plugin add dev-process-kit@dev-process-kit
+
+# GitHub Copilot CLI
+copilot plugin marketplace add neko3cs/dev-process-kit
+copilot plugin install dev-process-kit@dev-process-kit
 
 # Antigravity（AGY CLI 1.3.3 以上）
 agy plugin install https://github.com/neko3cs/dev-process-kit/plugins/dev-process-kit
@@ -73,6 +80,9 @@ claude plugin update dev-process-kit@dev-process-kit
 
 # Codex
 codex plugin marketplace upgrade dev-process-kit
+
+# GitHub Copilot CLI
+copilot plugin update dev-process-kit
 ```
 
 ## ライセンス
