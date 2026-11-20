@@ -91,7 +91,7 @@ agy plugin install https://github.com/neko3cs/dev-process-kit/plugins/dev-proces
 /dev-process-kit:implement 12
 ```
 
-`dev-process-kit:implement` は、マージ済みの設計文書をもとに実装とテストを書き、Issue 1つにつき1つの実装 PR を作ります。PR 本文には `Closes #12` と、受け入れ基準ごとに対応するテストが書かれます。
+`dev-process-kit:implement` は、マージ済みの設計文書をもとに、ユニットテストを先に書いて部品を作るテスト駆動開発（TDD）で実装し、インテグレーションテストとシナリオテストで仕様と業務要件を確かめて、Issue 1つにつき1つの実装 PR を作ります。PR 本文には `Closes #12` と、受け入れ基準ごとに対応するテストが書かれます。
 
 実装の途中で設計の不足や誤りが見つかると、`dev-process-kit:implement` は実装を止めます。実装 PR を Draft にし、別の設計 PR で設計を直します。その設計 PR をレビューしてマージしてから、もう一度 `/dev-process-kit:implement 12` を実行すると、実装が再開されます。
 

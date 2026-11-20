@@ -74,7 +74,7 @@ Existing conventions decide where the documents live. Without one, they go under
 
 ## `dev-process-kit:implement`
 
-Implements from the merged design documents, with one implementation PR per Issue. Source: [`skills/implement/SKILL.md`](../plugins/dev-process-kit/skills/implement/SKILL.md)
+Implements from the merged design documents, with one implementation PR per Issue. Source: [`skills/implement/SKILL.md`](../plugins/dev-process-kit/skills/implement/SKILL.md); test definitions: [`unit-test.md`](../plugins/dev-process-kit/skills/implement/references/unit-test.md), [`integration-test.md`](../plugins/dev-process-kit/skills/implement/references/integration-test.md), [`scenario-test.md`](../plugins/dev-process-kit/skills/implement/references/scenario-test.md)
 
 ### When to use
 
@@ -95,6 +95,11 @@ Implements from the merged design documents, with one implementation PR per Issu
   | Detailed design (not documented) | Unit tests |
 
   Constraints in `architecture.md` are enforced by the build structure or checked in PR review.
+- Builds parts with test-driven development (TDD), writing unit tests first and running Red → Green → Refactor for one TODO list item at a time.
+- Once a feature works, writes integration tests: inputs and expected results come from the specification, and the parts inside the system boundary are integrated without test doubles.
+- Once the business flow works end to end, writes scenario tests: the business procedure in the business requirements becomes the test procedure, as UI tests for GUI apps or test scripts for batch jobs.
+- Measures coverage with unit and integration tests, not scenario tests.
+- Writes tests so they read as a specification: in the same language as the design documents, grouped by the context of the specification, with names that include the expected result.
 - Copies the rows of business rule tables directly into test data.
 - If a gap or an error in the design turns up during implementation, stops, turns the implementation PR into a Draft, and fixes the design in a separate design PR. It resumes after that PR is merged.
 - Writes `Closes #<number>` in the implementation PR body from the start. The body also lists the test for each acceptance criterion, and separates verified from unverified checks.

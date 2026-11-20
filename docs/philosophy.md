@@ -62,7 +62,23 @@ Each Issue gets exactly one implementation PR. While anything still waits on a h
 
 ## Tests are defined in test code
 
-Test cases and test procedures are not written as documents; they are defined in test code. Tests are written together with the implementation. Putting as much of the test specification into code as possible lets the same tests run as regression tests on every change.
+Test cases and test procedures are not written as documents; they are defined in test code. Putting as much of the test specification into code as possible lets the same tests run as regression tests on every change.
+
+### Each kind of test has a fixed definition
+
+This plugin defines what unit tests, integration tests, and scenario tests verify, how they are designed, and when they are written. The definitions are fixed so that quality does not vary from session to session.
+
+| Test | Also known as | Design approach | Collaborators | When to write | Coverage |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Unit test | Component test | White-box | May be isolated with test doubles (mocks, stubs) | Before the implementation (TDD) | Measured |
+| Integration test | — | Black-box: inputs and expected results come from the specification | Inside the system boundary, no test doubles; the real parts are integrated | Usually after the implementation | Measured |
+| Scenario test | System test | The business procedure defined in the business requirements becomes the test procedure | Runs on the real configuration | Usually after the implementation | Not measured |
+
+- **Unit tests come before the implementation**: unit tests stand in for detailed design, so writing them first keeps the idea of building downstream from what was decided upstream intact between detailed design and code. The procedure is defined down to splitting work into a TODO list, the Red → Green → Refactor cycle, and the three strategies for getting a test to pass (fake it, obvious implementation, and triangulation).
+- **Integration and scenario tests may come after the implementation**: their expected results are already fixed by the frozen design documents, so writing them afterward does not make them follow the code. Because the business procedure is the test procedure, a scenario test is unlikely to be wrong as long as the business requirements are right.
+- **Scenario tests are not measured for coverage**: a scenario test is the business scenario itself. Changing its steps to raise code coverage would make it impossible to check against the business requirements. Coverage is measured with unit and integration tests.
+
+### Which design document each test level verifies
 
 This plugin decides which design document is verified at which level of testing. Each design level is paired with the verification that checks it.
 
@@ -74,7 +90,7 @@ This plugin decides which design document is verified at which level of testing.
 | Architecture document | Structural enforcement and review |
 | Detailed design (not documented) | Unit tests |
 
-- Detailed design is not documented, because it would become a copy of the code that nobody can maintain. Instead, unit tests are written so they read as a specification.
+- Detailed design is not documented, because it would become a copy of the code that nobody can maintain. Instead, unit tests are written before the implementation so they read as a specification.
 - Business rules in the specification are written as tables of inputs and expected results. Tests copy the rows of these tables directly, so people can check the tests against the tables.
 - The AI can run acceptance tests and collect evidence, but people decide GO / NO-GO.
 
@@ -88,6 +104,7 @@ This plugin decides the flow of the phases and the rules that keep the flow inta
 | Design is recorded in three design documents | Where the design documents live (existing conventions win) |
 | Merging the design PR freezes the specification | PR format and templates |
 | One implementation PR per Issue | Branch names and how branches are created |
-| The PR stays in Draft while a decision is pending | How implementation is carried out |
+| The PR stays in Draft while a decision is pending | Coding conventions |
 | Design problems found during implementation are fixed in a separate design PR | Test frameworks and tools |
 | Which design document is verified at which level | How quality gates are run |
+| The definition of each kind of test (including TDD for unit tests) | Detailed conventions for writing tests, such as test names |

@@ -1,6 +1,6 @@
 ---
 name: implement
-description: Implement a GitHub issue from requirements.md, specification.md, and architecture.md on one implementation PR. Scope work by matching the issue and design PR changes to the design docs, implement and verify against the design docs, mark ready for review, and address implementation PR reviews. Commit, push, and create or update the PR without per-operation approval. When the design is missing, undecided, or wrong, do not implement on assumptions; stop and get the design fixed in a separate design PR, then resume after it is merged (if the user does not want design docs, ask in chat instead). Use for "/dev-process-kit:implement 4", "implement issue #4", "resolve issue #4", "fix issue #4", "#4を実装して", "#4を解決して", "#4を直して", "実装PRのレビューを反映して", or "PR #5 のレビューに対応して".
+description: Implement a GitHub issue from requirements.md, specification.md, and architecture.md on one implementation PR. Scope work by matching the issue and design PR changes to the design docs, implement with test-first unit tests (TDD) plus integration and scenario tests and verify against the design docs, mark ready for review, and address implementation PR reviews. Commit, push, and create or update the PR without per-operation approval. When the design is missing, undecided, or wrong, do not implement on assumptions; stop and get the design fixed in a separate design PR, then resume after it is merged (if the user does not want design docs, ask in chat instead). Use for "/dev-process-kit:implement 4", "implement issue #4", "resolve issue #4", "fix issue #4", "#4を実装して", "#4を解決して", "#4を直して", "実装PRのレビューを反映して", or "PR #5 のレビューに対応して".
 license: MIT
 ---
 
@@ -64,17 +64,19 @@ license: MIT
 
 1. 統合ブランチからブランチを作る。ブランチ名と作り方は、リポジトリの規約や利用者の指示に従う。`AGENTS.md` に指示（worktree を使わない、など）があれば従う。
 2. 実装前のテストの成否を記録する（後で「元々失敗していたテスト」と「新たに壊したテスト」を区別するため）。
-3. 設計文書の受け入れ基準と業務ルールを満たすように実装し、それを確かめるテストを、作業範囲の設計文書ごとに次の対応で書く。
+3. 設計文書の受け入れ基準と業務ルールを満たすように実装し、それを確かめるテストを、作業範囲の設計文書ごとに次の対応で書く。各テストの定義（設計の方式、結合の範囲、書く時期、カバレッジ）と書き方は、対応する参考資料に従う。
 
-   | 作業範囲の設計文書 | 書くテスト |
-   | :--- | :--- |
-   | `requirements.md` の業務要件 | シナリオテスト。機能をまたいで業務の流れを通し、システムが担う部分を確かめる |
-   | `specification.md` | インテグレーションテスト。1つの機能の振る舞いが仕様どおりかを確かめる。画面・保存・外部連携を介さずに入力から結果が決まる計算規則は、表の行に対応づけたユニットテストでもよい |
-   | 詳細設計（文書にしない） | ユニットテスト。仕様として読めるように書き、詳細設計の代わりにする |
+   | 作業範囲の設計文書 | 書くテスト | 書く時期 | 参考資料 |
+   | :--- | :--- | :--- | :--- |
+   | `requirements.md` の業務要件 | シナリオテスト。機能をまたいで業務の流れを通し、システムが担う部分を確かめる | 基本は実装の後 | [シナリオテスト](references/scenario-test.md) |
+   | `specification.md` | インテグレーションテスト。モジュールを結合し、1つの機能の振る舞いが仕様どおりかをブラックボックスで確かめる。画面・保存・外部連携を介さずに入力から結果が決まる計算規則は、表の行に対応づけたユニットテストでもよい | 基本は実装の後 | [インテグレーションテスト](references/integration-test.md) |
+   | 詳細設計（文書にしない） | ユニットテスト。仕様として読めるように書き、詳細設計の代わりにする | プロダクトコードより先（TDD） | [ユニットテスト](references/unit-test.md) |
+
+   部品はユニットテストのテスト駆動のサイクルで作り、部品がそろって機能ができたらインテグレーションテストで、業務の流れが通るようになったらシナリオテストで確かめる。
 
    - `architecture.md` の制約は、構造で強制できるものはビルドの仕組みで強制し、できないものは PR のレビューで照合する。非機能要件は `requirements.md` の目標を合否条件として確かめる。
    - 人を含む業務全体の受け入れテストは、実行と証拠集め（操作ログ、スクリーンショット、録画）を手伝えるが、GO / NO-GO は人が判断する。結果を確認済みとして扱わず、PR本文で人の判断を待つ項目として示す。
-   - テストフレームワーク、ツール、実装とテストの進め方、書き方は、プロジェクトの既存のテスト・規約と利用者の指示に合わせる。
+   - テストフレームワーク、ツール、テストの書き方の細かい規約は、プロジェクトの既存のテスト・規約と利用者の指示に合わせる。参考資料で定めたテストの定義と、ユニットテストを先に書く進め方は変えない。
    - 対のテストを実行できる仕組みがプロジェクトに無い場合（シナリオテストの環境が無いなど）も、黙ってユニットテストだけで済ませない。確かめられなかった範囲を PR本文の未確認に書き、仕組みが無いことと検証の限界を `architecture.md` の「検証方針と重点リスク」に残す必要があれば手順6に従う。
    - 業務ルールの表の行は、テストのデータとしてそのまま写す。テスト名か説明に、設計文書の該当箇所が分かる言葉を含め、人が表と見比べられるようにする。
 4. **設計文書に書かれた合意済みの仕様だけを実装する。** 実装の途中で、設計の不足・未決が見つかった、またはマージ済みの設計が間違っていると判断した場合は、実装PRの中で仮案にせず、「設計を直す必要があるとき」に従う。
