@@ -91,7 +91,7 @@ When you are satisfied, merge the design PR. **This merge means the specificatio
 /dev-process-kit:implement 12
 ```
 
-`dev-process-kit:implement` works from the merged design documents test-first (TDD), writing each test before the code that passes it, and opens one implementation PR per Issue. The PR body contains `Closes #12` and the tests that correspond to each acceptance criterion.
+`dev-process-kit:implement` works from the merged design documents: it builds parts test-first with unit tests (TDD), verifies the specification and business requirements with integration and scenario tests, and opens one implementation PR per Issue. The PR body contains `Closes #12` and the tests that correspond to each acceptance criterion.
 
 If a gap or an error in the design turns up during implementation, `dev-process-kit:implement` stops. It turns the implementation PR into a Draft and fixes the design in a separate design PR. Once you review and merge that design PR, run `/dev-process-kit:implement 12` again to resume the implementation.
 

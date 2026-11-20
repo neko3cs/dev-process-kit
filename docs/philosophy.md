@@ -64,11 +64,19 @@ Each Issue gets exactly one implementation PR. While anything still waits on a h
 
 Test cases and test procedures are not written as documents; they are defined in test code. Putting as much of the test specification into code as possible lets the same tests run as regression tests on every change.
 
-### Tests come before the implementation
+### Each kind of test has a fixed definition
 
-At every level, tests are written before the implementation (test-driven development, TDD). Scenario tests and integration tests are written first from the design documents and confirmed to fail; then the parts needed to pass them are built through the Red → Green → Refactor cycle of unit tests. This plugin defines the procedure down to splitting work into a TODO list and the three strategies for getting a test to pass (fake it, obvious implementation, and triangulation).
+This plugin defines what unit tests, integration tests, and scenario tests verify, how they are designed, and when they are written. The definitions are fixed so that quality does not vary from session to session.
 
-The procedure is fixed so that quality does not vary from session to session. The idea of building downstream from what was decided upstream also applies between tests and code: writing the unit tests that stand in for detailed design first keeps detailed design ahead of implementation.
+| Test | Also known as | Design approach | Collaborators | When to write | Coverage |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Unit test | Component test | White-box | May be isolated with test doubles (mocks, stubs) | Before the implementation (TDD) | Measured |
+| Integration test | — | Black-box: inputs and expected results come from the specification | Inside the system boundary, no test doubles; the real parts are integrated | Usually after the implementation | Measured |
+| Scenario test | System test | The business procedure defined in the business requirements becomes the test procedure | Runs on the real configuration | Usually after the implementation | Not measured |
+
+- **Unit tests come before the implementation**: unit tests stand in for detailed design, so writing them first keeps the idea of building downstream from what was decided upstream intact between detailed design and code. The procedure is defined down to splitting work into a TODO list, the Red → Green → Refactor cycle, and the three strategies for getting a test to pass (fake it, obvious implementation, and triangulation).
+- **Integration and scenario tests may come after the implementation**: their expected results are already fixed by the frozen design documents, so writing them afterward does not make them follow the code. Because the business procedure is the test procedure, a scenario test is unlikely to be wrong as long as the business requirements are right.
+- **Scenario tests are not measured for coverage**: a scenario test is the business scenario itself. Changing its steps to raise code coverage would make it impossible to check against the business requirements. Coverage is measured with unit and integration tests.
 
 ### Which design document each test level verifies
 
@@ -99,4 +107,4 @@ This plugin decides the flow of the phases and the rules that keep the flow inta
 | The PR stays in Draft while a decision is pending | Coding conventions |
 | Design problems found during implementation are fixed in a separate design PR | Test frameworks and tools |
 | Which design document is verified at which level | How quality gates are run |
-| The procedure for writing tests before the implementation (TDD) | Detailed conventions for writing tests, such as test names |
+| The definition of each kind of test (including TDD for unit tests) | Detailed conventions for writing tests, such as test names |
