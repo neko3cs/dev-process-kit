@@ -28,7 +28,7 @@ Files a request as a GitHub Issue. Source: [`skills/issue/SKILL.md`](../plugins/
 ### What it does
 
 - Re-reads the target repository's `.github/ISSUE_TEMPLATE/` every time it files an Issue. If there is none, it uses the templates in the owner's `.github` repository. If neither exists, it writes the body under three headings: a description, the motivation and background, and the acceptance criteria.
-- Always fills in required fields. An undecided part of the request is written as an assumption (marked `仮定:`) with its reason; the skill does not stop filing to ask.
+- Always fills in required fields. The body is written as a finished request: for an undecided part, the skill picks the most reasonable content and writes it as the request, without markers such as `仮定` (assumption) or `TBD`. It does not stop filing to ask; instead, it asks in an Issue comment whether that content is right.
 - Does not invent facts such as reproduction results, environments, or measurements; it marks them as unconfirmed.
 - Puts the request in the body and moves long investigation results and history into comments. A comment on the same topic is rewritten rather than followed by a new one.
 
@@ -60,7 +60,7 @@ Existing conventions decide where the documents live. Without one, they go under
 ### What it does
 
 - If none of the three documents exist, creates them from templates; if they exist, updates only the relevant sections as a diff. It never rewrites an existing document wholesale.
-- For undecided design, picks a concrete provisional proposal and writes it as an unapproved assumption (marked `仮定（未承認）:`) with its reason. It asks in design PR comments whether to adopt each proposal.
+- Writes the documents as finished work. For undecided design, picks the most reasonable option and writes it as the specification with its reason, without markers such as `仮定` (assumption), `未承認` (unapproved), or `TBD`. It asks in design PR comments whether each choice is right and reflects the answers by rewriting the sections.
 - When the code and the design documents disagree, treats the documents as correct and reports the difference as a defect in the code.
 - Creates the working branch, commits, pushes, and opens the design PR without asking permission for each operation. The design PR links the Issue with `Refs #<number>` so that it does not close the Issue.
 

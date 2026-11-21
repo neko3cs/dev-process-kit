@@ -30,7 +30,7 @@ The phases move in one direction, from upstream to downstream.
 
 Development starts from an Issue. Every request is filed and tracked as an Issue. When what to build is recorded in an Issue, people and AI without the conversation history can later pick up from the same place.
 
-An Issue holds only the request. Parts of the request that are not settled yet are stated as assumptions, and work moves on. The agreement on what to build and the acceptance criteria go into the requirements document (`requirements.md`). The requirements document is written in the same design PR as the specification and the architecture document, and all three are agreed together when that PR is merged.
+An Issue holds only the request. Even parts of the request that are not settled yet are written as a finished request, with the most reasonable content, and are asked about in Issue comments so that work moves on. The agreement on what to build and the acceptance criteria go into the requirements document (`requirements.md`). The requirements document is written in the same design PR as the specification and the architecture document, and all three are agreed together when that PR is merged.
 
 ### Design defines the specification the requirements call for
 
@@ -42,7 +42,7 @@ Design starts once the requirements are settled. It defines how the system or ap
 | Specification (`specification.md`) | What should happen under which conditions |
 | Architecture document (`architecture.md`) | Which structure and constraints realize it, and why |
 
-Design documents are not a copy of the current code. They record the commitments people made and the reasons behind those decisions. Where something is undecided, the AI writes a provisional proposal and asks people in design PR comments whether to adopt it.
+Design documents are not a copy of the current code. They record the commitments people made and the reasons behind those decisions. The AI writes them as finished work, not as drafts full of assumptions. Where something is undecided, it picks the most reasonable option, writes it as the specification, and asks people in design PR comments whether that choice is right.
 
 ### Merging the design PR freezes the specification
 
