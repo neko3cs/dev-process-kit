@@ -28,7 +28,7 @@ Files a request as a GitHub Issue. Source: [`skills/issue/SKILL.md`](../plugins/
 ### What it does
 
 - Re-reads the target repository's `.github/ISSUE_TEMPLATE/` every time it files an Issue. If there is none, it uses the templates in the owner's `.github` repository. If neither exists, it writes the body under three headings: a description, the motivation and background, and the acceptance criteria. `config.yml` is the chooser's configuration, not a template, so it is never picked. When a template exists, the Issue always follows one, whatever `blank_issues_enabled` says.
-- Leaves `type: markdown` elements of Issue Forms out of the body, as GitHub does on submission, and sets the template's `assignees`, `projects`, and `type` as well as its title prefix and labels.
+- Leaves `type: markdown` elements of Issue Forms out of the body, as GitHub does on submission, and sets the template's `assignees`, `projects`, and `type` as well as its title prefix and labels. A template label that the target repository lacks is left off rather than created, the Issue is still filed, and the skill tells the user which labels it could not add.
 - Always fills in required fields. The body is written as a finished request: for an undecided part, the skill picks the most reasonable content and writes it as the request, without markers such as `仮定` (assumption) or `TBD`. It does not stop filing to ask; instead, it asks in an Issue comment whether that content is right.
 - Does not invent facts such as reproduction results, environments, or measurements; it marks them as unconfirmed.
 - Puts the request in the body and moves long investigation results and history into comments. A comment on the same topic is rewritten rather than followed by a new one.
