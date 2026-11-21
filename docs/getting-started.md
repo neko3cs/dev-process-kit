@@ -51,7 +51,7 @@ How you invoke a skill depends on the harness.
 | Claude Code, GitHub Copilot CLI | `/dev-process-kit:issue` |
 | Codex | `$dev-process-kit:issue` |
 
-The examples below use the Claude Code form. Besides calling a skill by name, a request such as "create an issue" or "design #12" may also select the skill.
+The examples below use the Claude Code form. Each skill runs only when you call it by name. A general request such as "create an issue" or "fix #12" does not start it, so nothing happens in a repository that does not use this process.
 
 ## 2. File the request as an Issue
 
@@ -93,7 +93,9 @@ When you are satisfied, merge the design PR. **This merge means the specificatio
 
 `dev-process-kit:implement` works from the merged design documents: it builds parts test-first with unit tests (TDD), verifies the specification and business requirements with integration and scenario tests, and opens one implementation PR per Issue. The PR body contains `Closes #12` and the tests that correspond to each acceptance criterion.
 
-If a gap or an error in the design turns up during implementation, `dev-process-kit:implement` stops. It turns the implementation PR into a Draft and fixes the design in a separate design PR. Once you review and merge that design PR, run `/dev-process-kit:implement 12` again to resume the implementation.
+If the external specification in the design documents has a gap or an error, `dev-process-kit:implement` stops. It turns the implementation PR into a Draft, tells you which section needs fixing, and asks you to run `/dev-process-kit:design 12`. Once you review and merge that design PR, run `/dev-process-kit:implement 12` again to resume the implementation. Details that the design documents do not cover (internal design) do not stop it: it decides them, expresses them as unit tests, and lists them in the PR body.
+
+If you want to change the specification while the implementation is in progress, the current Issue is finished under the frozen specification. File the change as a new Issue and start again from design.
 
 ## 6. Run acceptance tests and merge the implementation PR (your part)
 

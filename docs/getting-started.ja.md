@@ -51,7 +51,7 @@ agy plugin install https://github.com/neko3cs/dev-process-kit/plugins/dev-proces
 | Claude Code、GitHub Copilot CLI | `/dev-process-kit:issue` |
 | Codex | `$dev-process-kit:issue` |
 
-以降の例は Claude Code の書き方で示します。名前で呼び出すほか、「Issue を作って」「#12 を設計して」のような依頼からスキルが選ばれることもあります。
+以降の例は Claude Code の書き方で示します。どのスキルも、名前で呼んだときだけ動きます。「Issue を作って」「#12 を直して」のような一般的な依頼では起動しないため、このプロセスを使っていないリポジトリでは何も起きません。
 
 ## 2. 要望を Issue に起票する
 
@@ -93,7 +93,9 @@ agy plugin install https://github.com/neko3cs/dev-process-kit/plugins/dev-proces
 
 `dev-process-kit:implement` は、マージ済みの設計文書をもとに、ユニットテストを先に書いて部品を作るテスト駆動開発（TDD）で実装し、インテグレーションテストとシナリオテストで仕様と業務要件を確かめて、Issue 1つにつき1つの実装 PR を作ります。PR 本文には `Closes #12` と、受け入れ基準ごとに対応するテストが書かれます。
 
-実装の途中で設計の不足や誤りが見つかると、`dev-process-kit:implement` は実装を止めます。実装 PR を Draft にし、別の設計 PR で設計を直します。その設計 PR をレビューしてマージしてから、もう一度 `/dev-process-kit:implement 12` を実行すると、実装が再開されます。
+設計文書に書かれた外部仕様に不足や誤りが見つかると、`dev-process-kit:implement` は実装を止めます。実装 PR を Draft にし、直す必要のある節を示して、`/dev-process-kit:design 12` の実行を頼みます。その設計 PR をレビューしてマージしてから、もう一度 `/dev-process-kit:implement 12` を実行すると、実装が再開されます。設計文書に書かれていない細部（内部設計）では止まりません。決めた内容をユニットテストで表し、PR 本文に挙げます。
+
+実装の途中で仕様を変えたくなった場合は、今の Issue は凍結した仕様のまま完了させます。変更は新しい Issue として起票し、設計からやり直します。
 
 ## 6. 受け入れテストをして、実装 PR をマージする（人の作業）
 

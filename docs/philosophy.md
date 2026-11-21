@@ -52,9 +52,13 @@ When the code and the design documents disagree, the design documents win, and t
 
 ### When the specification changes, stop and go back upstream
 
-If a gap or an error in the specification turns up during implementation, the implementation PR does not settle on a provisional specification and carry on. Implementation stops, and the specification is fixed in a separate design PR. Implementation resumes only after that design PR is merged and the specification is frozen again.
+If a gap or an error in the specification turns up during implementation, the implementation PR does not settle on a provisional specification and carry on. Implementation stops, the user is told, and the specification is fixed in a separate design PR that the user starts with `dev-process-kit:design`. Implementation resumes only after that design PR is merged and the specification is frozen again.
 
 This rework follows the same idea as sending a specification change back to an upstream phase in waterfall. It is also the rule that keeps the AI from rewriting the specification for the convenience of the implementation.
+
+What stops implementation is a change to the external specification: anything written in the design documents. The design documents cover external design only, so details they do not cover (internal design) are decided during implementation and expressed as unit tests, without stopping. Stopping for every such detail would only add rework.
+
+A specification change that the user asks for in the middle of implementation is not folded into the Issue in progress. That Issue is finished under the frozen specification, and the change goes through design and implementation again as a new Issue, the way a waterfall project finishes the work under way before taking on a change request. The exception is a fatal problem, such as the specification as written losing data, which stops implementation as above.
 
 ### One implementation PR per Issue
 
@@ -105,6 +109,6 @@ This plugin decides the flow of the phases and the rules that keep the flow inta
 | Merging the design PR freezes the specification | PR format and templates |
 | One implementation PR per Issue | Branch names and how branches are created |
 | The PR stays in Draft while a decision is pending | Coding conventions |
-| Design problems found during implementation are fixed in a separate design PR | Test frameworks and tools |
+| External specification problems found during implementation stop it and are fixed in a separate design PR; internal design is decided in unit tests | Test frameworks and tools |
 | Which design document is verified at which level | How quality gates are run |
 | The definition of each kind of test (including TDD for unit tests) | Detailed conventions for writing tests, such as test names |
