@@ -84,6 +84,7 @@ Implements from the merged design documents, with one implementation PR per Issu
 
 ### What it does
 
+- Looks for the design documents in the same order that `design` uses to place them (existing conventions, under `docs/`, the repository root). It uses that location to tell whether design documents exist and whether a PR is a design PR.
 - Reads the Issue and the diff of the related design PRs, and decides the scope of work by matching them against the design documents.
 - Does not start implementing if there are no design documents, if the Issue's content is not in the design documents, or if `TBD` remains in the scope. Instead, it opens a design PR or waits for an unmerged design PR to be merged.
 - Writes tests at the following level for each design document.
