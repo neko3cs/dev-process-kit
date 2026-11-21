@@ -37,13 +37,16 @@ gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE --jq '.[].name'
 gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE/<ファイル名> --jq '.content' | base64 -d
 ```
 
+テンプレートの候補は、`.md`・`.yml`・`.yaml` のファイルのうち `config.yml`（または `config.yaml`）を除いたものとする。`config.yml` はテンプレート選択画面の設定（`blank_issues_enabled`、`contact_links`）で、テンプレートではない。`blank_issues_enabled` の値に関わらず、テンプレートが1つでもあれば必ずどれかに従う（「注意事項」）。
+
 テンプレートが複数あれば、依頼の内容（バグ報告か機能要望かなど）に合うものを選ぶ。判断が難しい場合は、ユーザーにどれか確認する。
 
 Issue Forms（YAML）のテンプレートからは、次を読み取る。
 
 - `title`: タイトルに付与するプレフィックス（例: `[Bug]: `）
 - `labels`: 付与するラベル（例: `bug`、`enhancement`）
-- `body`: 各フィールドの `id` / `label` / `required` / `placeholder`
+- `assignees` / `projects` / `type`: 起票時に設定する担当者・プロジェクト・Issue タイプ。GitHub のフォームから送信したときと同じ状態にするため、指定があればすべて設定する（手順4）
+- `body`: 各フィールドの `type` / `id` / `label` / `required` / `placeholder`。`type: markdown` の要素はフォームに表示される説明文で、送信しても本文に出ないため、本文に含めない（見出しも作らない）
 
 Markdown のテンプレートなら、その見出しの構成とコメントの指示に従う。
 
@@ -72,7 +75,7 @@ GitHub Issue Formsは送信時に各フィールドを `### {label}` の見出�
 2. ...
 ```
 
-フィールドの順序はYAMLの `body` の順序に揃える。
+フィールドの順序はYAMLの `body` の順序に揃える。`type: markdown` の要素は飛ばす。
 
 #### テンプレートが無い場合の本文
 
@@ -105,6 +108,7 @@ gh issue create -R <owner>/<repo> \
 
 - 対象リポジトリは特に指定がなければ作業中のリポジトリ（`origin`）を使う。別リポジトリ向けの場合は `-R owner/repo` を明示する。
 - タイトルのプレフィックスとラベルは、テンプレートの `title` と `labels` をそのまま使う。テンプレートが無ければ付けない。
+- テンプレートに `assignees` があれば `--assignee`、`type` があれば `--type` で設定する。`projects` は `<owner>/<番号>` の形式で、`--project` はプロジェクトのタイトルを取るため、`gh project view <番号> --owner <owner> --json title --jq '.title'` でタイトルを調べて渡す。権限やトークンのスコープ不足で設定できなければ、その項目を外して起票し、設定できなかった項目と理由をユーザーに伝える（フォームから送信しても、書き込み権限の無い人には設定されない項目のため）。
 - 本文は改行・見出しを含むため、シェルのクォート崩れを避けるためスクラッチディレクトリに一時ファイルを作成し `--body-file` で渡す。作成後は一時ファイルを削除する。
 - 完成した要望として内容を揃え、このステップまで確認なしで進めて作成する。作成後にIssue URLを提示する。
 
