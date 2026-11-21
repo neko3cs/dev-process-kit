@@ -1,7 +1,8 @@
 ---
 name: design
-description: Create and maintain three design documents (requirements.md, specification.md, architecture.md), including designing a GitHub issue into acceptance criteria and business rules. Use for "write design docs", "design issue #4", "update the specification", "設計ドキュメントを作って", "ドキュメントを整備して", "#4を設計して", "要件定義して", "要件をまとめて", "設計PRのレビューを反映して", "仕様変更をドキュメントに反映して", or "この実装を設計書に反映して", including workflow requests to update docs or compare them with code. Keep docs self-contained and authoritative; report mismatches as code defects unless a specification change is requested. Write docs as finished deliverables: settle undecided design on the best option without assumption or unapproved markers, and ask concrete questions about those choices in PR comments. Commit, push, and create or update a PR without per-operation approval. Do not implement code.
+description: Create and maintain three design documents (requirements.md, specification.md, architecture.md) for the dev-process-kit process, including designing a GitHub issue into acceptance criteria and business rules, addressing design PR reviews, and reflecting specification changes. Keep docs self-contained and authoritative; report mismatches as code defects unless a specification change is requested. Write docs as finished deliverables: settle undecided design on the best option without assumption or unapproved markers, and ask concrete questions about those choices in PR comments. Commit, push, and create or update a PR without per-operation approval. Do not implement code. Run only when the user explicitly invokes this skill by name ("/dev-process-kit:design 4", "$dev-process-kit:design 4"); do not select it for general requests such as "design issue #4" or "ドキュメントを整備して".
 license: MIT
+disable-model-invocation: true
 ---
 
 # design Skill
@@ -101,8 +102,7 @@ Issue 番号を渡されたら、その Issue を設計文書に落とし込み�
 設計文書の作成・更新の依頼には、作業ブランチの作成、対象変更のコミット、push、PR作成・本文更新、未決事項への質問コメントの投稿までを含みます。操作ごとの許可や、設計内容の事前承認を会話で求めず、レビューできる PRにして URLを提示します。マージはユーザーの判断とします。
 
 - 既存の設計用の作業ブランチや PRがあれば再利用し、今回の対象変更だけをコミットする。
-- 設計の追加・変更は、実装の途中で必要になった場合も、統合ブランチ（設計PRのマージ先）から切った設計用のブランチで、設計文書だけの設計PRにする。実装ブランチ・実装PRには含めない。設計PRのマージで仕様が合意・凍結され、実装はそのマージを待って再開するため。
-- 実装の一部として、合意済みの仕様を変えない補足（実装中に分かった判断の理由、見つけた制約など）の反映を頼まれた場合だけは、その実装ブランチ・PRに含め、別PRや途中のコミット・pushを作らず、呼び出した作業の完了手順に戻る。
+- 設計の追加・変更は、実装の途中で必要になった場合（`dev-process-kit:implement` が止まり、利用者がこのスキルを呼んだ場合）も、統合ブランチ（設計PRのマージ先）から切った設計用のブランチで、設計文書だけの設計PRにする。実装ブランチ・実装PRには含めない。設計PRのマージで仕様が合意・凍結され、実装はそのマージを待って再開するため。
 - PRの起票方法と本文は、対象リポジトリの規約・指定された PRテンプレートに従う。テンプレートの指定が無ければ、作成・本文更新のたびに次の順で探して読み直し、構成を記憶から補わない。
   - 対象リポジトリの `.github/`・リポジトリ直下・`docs/` にある `pull_request_template.md`、または `.github/PULL_REQUEST_TEMPLATE/` の中のファイル。
   - 対象リポジトリに無ければ、GitHub がテンプレートを引き継ぐ所有者の `.github` リポジトリの同じ場所（`gh api repos/<owner>/.github/contents/.github/pull_request_template.md --jq '.content' | base64 -d`）。

@@ -21,6 +21,8 @@ Files a request as a GitHub Issue. Source: [`skills/issue/SKILL.md`](../plugins/
 - To turn a feature request or a bug report into an Issue
 - To record background, investigation results, or the course of a discussion as a comment on an existing Issue
 
+It runs only when called by name. A general request such as "create an issue" does not start it.
+
 ```text
 /dev-process-kit:issue The login screen crashes
 ```
@@ -47,6 +49,8 @@ Designs an Issue into three design documents and opens a design PR. Source: [`sk
 - To design an Issue (`/dev-process-kit:design 12`, "design #12")
 - To address review comments on a design PR
 - To reflect a specification change in the design documents
+
+It runs only when called by name. A general request such as "design #12" or "write docs" does not start it, and `dev-process-kit:implement` does not call it either: when the design falls short, `implement` stops and asks you to run it.
 
 ### Documents it produces
 
@@ -83,11 +87,13 @@ Implements from the merged design documents, with one implementation PR per Issu
 - To fix a bug whose correct behavior is already written in the design documents
 - To address review comments on an implementation PR
 
+It runs only when called by name. A general request such as "fix #12" does not start it, so it does not start this process in a repository that does not use it.
+
 ### What it does
 
 - Looks for the design documents in the same order that `design` uses to place them (existing conventions, under `docs/`, the repository root). It uses that location to tell whether design documents exist and whether a PR is a design PR.
 - Reads the Issue and the diff of the related design PRs, and decides the scope of work by matching them against the design documents.
-- Does not start implementing if there are no design documents, if the Issue's content is not in the design documents (for a bug report, the correct behavior it expects, not the failure itself), or if `TBD` remains in the scope. Instead, it opens a design PR or waits for an unmerged design PR to be merged.
+- Does not start implementing if there are no design documents, if the Issue's content is not in the design documents (for a bug report, the correct behavior it expects, not the failure itself), or if `TBD` remains in the scope. Instead, it waits for an unmerged design PR to be merged, or tells you what is missing and asks you to run `/dev-process-kit:design`. It does not write design documents itself.
 - Writes tests at the following level for each design document.
 
   | Design document | Tests |
@@ -103,7 +109,9 @@ Implements from the merged design documents, with one implementation PR per Issu
 - Measures coverage with unit and integration tests, not scenario tests.
 - Writes tests so they read as a specification: in the same language as the design documents, grouped by the context of the specification, with names that include the expected result.
 - Copies the rows of business rule tables directly into test data.
-- If a gap or an error in the design turns up during implementation, stops, turns the implementation PR into a Draft, and fixes the design in a separate design PR. It resumes after that PR is merged.
+- Sorts design problems found during implementation into two kinds. If the external specification written in the design documents has to change (acceptance criteria, business rule tables, screen behavior, inputs and outputs, constraints in `architecture.md`), or following it as written would fail the acceptance criteria, contradict another document, or lose data, it stops, turns the implementation PR into a Draft, and asks you to run `/dev-process-kit:design`. It resumes after that design PR is merged. Details the documents do not cover (internal design) do not stop it: it decides them, expresses them as unit tests, and lists them in the PR body.
+- When you ask for a specification change during implementation, finishes the current Issue under the frozen specification and asks you to file the change as a new Issue.
+- Leaves information worth adding to the design documents as a PR comment marked as a candidate, instead of writing it there.
 - Writes a `Closes #<number>` line of its own in the implementation PR body from the start. It finds the design PR and implementation PR for the same Issue by these lines, not by full-text search alone, so PRs that merely mention the number are not picked up. The body also lists the test for each acceptance criterion, and separates verified from unverified checks.
 - Keeps the PR in Draft and asks in PR comments while anything waits on a human decision. It marks the PR Ready for review only after the quality gates pass and automated checks are addressed.
 - After Ready for review, pushes once per batch of review fixes.
@@ -112,5 +120,6 @@ Implements from the merged design documents, with one implementation PR per Issu
 
 - Decide on a specification that is not in the design documents and implement it inside the implementation PR
 - Rewrite the design documents to match the code
+- Write design documents or open design PRs (`dev-process-kit:design` does, when you run it)
 - Write to the Issue (it only reads Issues)
 - Decide GO / NO-GO in acceptance testing, or merge the implementation PR (a person decides)
