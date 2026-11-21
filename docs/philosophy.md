@@ -44,6 +44,8 @@ Design starts once the requirements are settled. It defines how the system or ap
 
 Design documents are not a copy of the current code. They record the commitments people made and the reasons behind those decisions. The AI writes them as finished work, not as drafts full of assumptions. Where something is undecided, it picks the most reasonable option, writes it as the specification, and asks people in design PR comments whether that choice is right.
 
+By default the three documents live in one place. A monorepo can keep a set of the three per service, with a set for the whole repository whose `architecture.md` indexes the others. A document that grows too large to update one section at a time can be split by feature into a directory of the same name, leaving the original file as the index. Either split is made in a design PR that changes only the structure, not the specification.
+
 ### Merging the design PR freezes the specification
 
 When a person reviews and merges the design PR, the specification is agreed and frozen. Implementation works only from the frozen specification.
@@ -63,6 +65,8 @@ A specification change that the user asks for in the middle of implementation is
 ### One implementation PR per Issue
 
 Each Issue gets exactly one implementation PR. While anything still waits on a human decision, the PR stays in Draft, so that by the time it is merged, the Issue is complete.
+
+An Issue too large to review as one implementation PR is split into child Issues, not into several PRs for the same Issue. The parent Issue is still designed in a single design PR, so the whole specification is agreed and frozen at once; that design PR proposes how to split the work, and each child covers its own acceptance criteria. Each child then gets its own implementation PR, and the parent is complete once every child is merged.
 
 ## Tests are defined in test code
 

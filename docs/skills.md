@@ -32,6 +32,7 @@ It runs only when called by name. A general request such as "create an issue" do
 - Re-reads the target repository's `.github/ISSUE_TEMPLATE/` every time it files an Issue. If there is none, it uses the templates in the owner's `.github` repository. If neither exists, it writes the body under three headings: a description, the motivation and background, and the acceptance criteria. `config.yml` is the chooser's configuration, not a template, so it is never picked. When a template exists, the Issue always follows one, whatever `blank_issues_enabled` says.
 - Leaves `type: markdown` elements of Issue Forms out of the body, as GitHub does on submission, and sets the template's `assignees`, `projects`, and `type` as well as its title prefix and labels. A template label that the target repository lacks is left off rather than created, the Issue is still filed, and the skill tells the user which labels it could not add.
 - Always fills in required fields. The body is written as a finished request: for an undecided part, the skill picks the most reasonable content and writes it as the request, without markers such as `仮定` (assumption) or `TBD`. It does not stop filing to ask; instead, it asks in an Issue comment whether that content is right.
+- When asked to file child Issues of a parent (for example, from the split proposed in a design PR), links each to the parent with `--parent` and copies its sections, acceptance criteria, and order from the design PR.
 - Does not invent facts such as reproduction results, environments, or measurements; it marks them as unconfirmed.
 - Puts the request in the body and moves long investigation results and history into comments. A comment on the same topic is rewritten rather than followed by a new one.
 
@@ -65,6 +66,8 @@ Existing conventions decide where the documents live. Without one, they go under
 ### What it does
 
 - If none of the three documents exist, creates them from templates; if they exist, updates only the relevant sections as a diff. It never rewrites an existing document wholesale.
+- In a monorepo, can keep a set of the three documents per service, indexed from the `architecture.md` of the set for the whole repository. A document too large to update one section at a time can be split by feature into a directory of the same name, with the original file kept as the index. Either split is proposed and made in its own design PR that changes only the structure.
+- For an Issue too large for one implementation PR, designs the parent Issue in one design PR and proposes in its body how to split the implementation into child Issues (each child's sections, acceptance criteria, and order). It does not create the child Issues.
 - Writes the documents as finished work. For undecided design, picks the most reasonable option and writes it as the specification with its reason, without markers such as `仮定` (assumption), `未承認` (unapproved), or `TBD`. It asks in design PR comments whether each choice is right and reflects the answers by rewriting the sections.
 - When the code and the design documents disagree, treats the documents as correct and reports the difference as a defect in the code.
 - Creates the working branch, commits, pushes, and opens the design PR without asking permission for each operation. The design PR links the Issue with a `Refs #<number>` line of its own so that it does not close the Issue.
@@ -113,6 +116,8 @@ It runs only when called by name. A general request such as "fix #12" does not s
 - When you ask for a specification change during implementation, finishes the current Issue under the frozen specification and asks you to file the change as a new Issue.
 - Leaves information worth adding to the design documents as a PR comment marked as a candidate, instead of writing it there.
 - Writes a `Closes #<number>` line of its own in the implementation PR body from the start. It finds the design PR and implementation PR for the same Issue by these lines, not by full-text search alone, so PRs that merely mention the number are not picked up. The body also lists the test for each acceptance criterion, and separates verified from unverified checks.
+- With service sets or split documents, reads the target service's set and only the relevant split files, found through the indexes.
+- On a parent Issue with open child Issues, does not implement; it lists the children and asks you to run it for each. On a child Issue, takes the scope from the "how to split into child Issues" part of the parent's design PR, and closes only the child.
 - Keeps the PR in Draft and asks in PR comments while anything waits on a human decision. It marks the PR Ready for review only after the quality gates pass and automated checks are addressed.
 - After Ready for review, pushes once per batch of review fixes.
 
