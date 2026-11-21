@@ -62,7 +62,7 @@ Existing conventions decide where the documents live. Without one, they go under
 - If none of the three documents exist, creates them from templates; if they exist, updates only the relevant sections as a diff. It never rewrites an existing document wholesale.
 - Writes the documents as finished work. For undecided design, picks the most reasonable option and writes it as the specification with its reason, without markers such as `仮定` (assumption), `未承認` (unapproved), or `TBD`. It asks in design PR comments whether each choice is right and reflects the answers by rewriting the sections.
 - When the code and the design documents disagree, treats the documents as correct and reports the difference as a defect in the code.
-- Creates the working branch, commits, pushes, and opens the design PR without asking permission for each operation. The design PR links the Issue with `Refs #<number>` so that it does not close the Issue.
+- Creates the working branch, commits, pushes, and opens the design PR without asking permission for each operation. The design PR links the Issue with a `Refs #<number>` line of its own so that it does not close the Issue.
 
 ### What it does not do
 
@@ -103,7 +103,7 @@ Implements from the merged design documents, with one implementation PR per Issu
 - Writes tests so they read as a specification: in the same language as the design documents, grouped by the context of the specification, with names that include the expected result.
 - Copies the rows of business rule tables directly into test data.
 - If a gap or an error in the design turns up during implementation, stops, turns the implementation PR into a Draft, and fixes the design in a separate design PR. It resumes after that PR is merged.
-- Writes `Closes #<number>` in the implementation PR body from the start. The body also lists the test for each acceptance criterion, and separates verified from unverified checks.
+- Writes a `Closes #<number>` line of its own in the implementation PR body from the start. It finds the design PR and implementation PR for the same Issue by these lines, not by full-text search alone, so PRs that merely mention the number are not picked up. The body also lists the test for each acceptance criterion, and separates verified from unverified checks.
 - Keeps the PR in Draft and asks in PR comments while anything waits on a human decision. It marks the PR Ready for review only after the quality gates pass and automated checks are addressed.
 - After Ready for review, pushes once per batch of review fixes.
 
