@@ -61,7 +61,7 @@ agy plugin install https://github.com/neko3cs/dev-process-kit/plugins/dev-proces
 /dev-process-kit:issue タスクの期限が過ぎたら、一覧で分かるようにしたい
 ```
 
-`dev-process-kit:issue` は、リポジトリの Issue テンプレートに従って Issue を作ります。テンプレートが無ければ、説明・動機と背景・受け入れ条件の見出しで書きます。決まっていない部分は `仮定:` として理由と一緒に書き、確認のために止まりません。
+`dev-process-kit:issue` は、リポジトリの Issue テンプレートに従って Issue を作ります。テンプレートが無ければ、説明・動機と背景・受け入れ条件の見出しで書きます。決まっていない部分は最も妥当な内容を選び、仮定の印を付けずに要望として書きます。確認のために止まらず、その内容でよいかを Issue コメントで質問します。
 
 作られた Issue の番号（ここでは #12 とします）を次の工程で使います。
 

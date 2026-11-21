@@ -61,7 +61,7 @@ Describe what you want, as it is.
 /dev-process-kit:issue Make overdue tasks stand out in the task list
 ```
 
-`dev-process-kit:issue` creates the Issue following the repository's Issue templates. Without a template, it writes the body under three headings: a description, the motivation and background, and the acceptance criteria. Anything undecided is written as an assumption with its reason, and the skill does not stop to ask.
+`dev-process-kit:issue` creates the Issue following the repository's Issue templates. Without a template, it writes the body under three headings: a description, the motivation and background, and the acceptance criteria. For anything undecided, it picks the most reasonable content and writes it as the request, without assumption markers. It does not stop to ask; it asks in an Issue comment whether that content is right.
 
 You use the number of the new Issue (#12 here) in the next phase.
 
