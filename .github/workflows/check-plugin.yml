@@ -1,0 +1,40 @@
+name: Check plugin
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check manifests and marketplaces
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [[ -n "$BASE_REF" ]]; then
+            .github/scripts/check-plugin-manifests.sh "origin/$BASE_REF"
+          else
+            .github/scripts/check-plugin-manifests.sh
+          fi
+
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code@2.1.330
+      - name: Validate marketplace and plugin
+        run: |
+          claude plugin validate .
+          claude plugin validate plugins/dev-process-kit
