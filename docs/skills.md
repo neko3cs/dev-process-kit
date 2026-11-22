@@ -2,7 +2,7 @@
 
 English | [日本語](skills.ja.md)
 
-This page summarizes what the three dev-process-kit skills read, produce, and do not do. Each skill's `SKILL.md` is the authoritative source for the detailed steps and decision criteria. The skill files are written in Japanese.
+This page summarizes what the three dev-process-kit skills read, produce, and do not do. Each skill's `SKILL.md` is the authoritative source for the detailed steps and decision criteria. The skill files are written in Japanese, but the Issues, design documents, and PRs they produce follow the language of the target repository.
 
 | Skill | Phase | Reads | Produces |
 | :--- | :--- | :--- | :--- |
@@ -33,6 +33,7 @@ It runs only when called by name. A general request such as "create an issue" do
 - Leaves `type: markdown` elements of Issue Forms out of the body, as GitHub does on submission, and sets the template's `assignees`, `projects`, and `type` as well as its title prefix and labels. A template label that the target repository lacks is left off rather than created, the Issue is still filed, and the skill tells the user which labels it could not add.
 - Always fills in required fields. The body is written as a finished request: for an undecided part, the skill picks the most reasonable content and writes it as the request, without markers such as `仮定` (assumption) or `TBD`. It does not stop filing to ask; instead, it asks in an Issue comment whether that content is right.
 - Files one Issue per requirement. If the request holds several requirements that each deliver value on their own, it shows how it would split them (a title and requirement per Issue) and asks before filing them as separate Issues; this is the only case where it stops before filing. It does not use parent and child Issues; each Issue gets a comment naming the others filed with it.
+- Writes in the language set by the repository's rules or your instructions; failing that, the template's language, then the language of the repository's main documents (the source version, not a translation), then the language of the conversation. Template headings, title prefixes, and labels are used as they are, without translation.
 - Does not invent facts such as reproduction results, environments, or measurements; it marks them as unconfirmed.
 - Puts the request in the body and moves long investigation results and history into comments. A comment on the same topic is rewritten rather than followed by a new one.
 
@@ -69,6 +70,7 @@ Existing conventions decide where the documents live. Without one, they go under
 - In a monorepo, can keep a set of the three documents per service, indexed from the `architecture.md` of the set for the whole repository. A document too large to update one section at a time can be split by feature into a directory of the same name, with the original file kept as the index. Either split is proposed and made in its own design PR that changes only the structure.
 - If an Issue holds several requirements that each deliver value on their own, stops before designing, shows how to split it, and asks you to file one Issue per requirement with `/dev-process-kit:issue`. It does not create, edit, or close Issues itself.
 - Writes the documents as finished work. For undecided design, picks the most reasonable option and writes it as the specification with its reason, without markers such as `仮定` (assumption), `未承認` (unapproved), or `TBD`. It asks in design PR comments whether each choice is right and reflects the answers by rewriting the sections.
+- Writes the documents and the design PR in the language set by the repository's rules or your instructions; failing that, the language of the existing design documents, then of the repository's main documents (the source version, not a translation), then of the conversation. The templates are in Japanese; in another language, their headings and text are translated while the sections, their order, and heading levels stay the same. Headings in existing documents are reused, not translated again. Markers of undecided design are not written in any language.
 - When the code and the design documents disagree, treats the documents as correct and reports the difference as a defect in the code.
 - Creates the working branch, commits, pushes, and opens the design PR without asking permission for each operation. The design PR links the Issue with a `Refs #<number>` line of its own so that it does not close the Issue.
 
@@ -116,6 +118,7 @@ It runs only when called by name. A general request such as "fix #12" does not s
 - When you ask for a specification change during implementation, finishes the current Issue under the frozen specification and asks you to file the change as a new Issue.
 - Leaves information worth adding to the design documents as a PR comment marked as a candidate, instead of writing it there.
 - Writes a `Closes #<number>` line of its own in the implementation PR body from the start. It finds the design PR and implementation PR for the same Issue by these lines, not by full-text search alone, so PRs that merely mention the number are not picked up. The body also lists the test for each acceptance criterion, and separates verified from unverified checks.
+- Reads design documents in any language, finding each section by its role rather than its heading. Treats any word or note marking a part as undecided or unapproved as a marker of undecided design, whatever the language (`仮定`, `TBD`, `Assumption`, `Unapproved`, and so on), and stops before implementing it. Writes the PR body and comments in the language set by the repository's rules or your instructions, or else in the language of the design documents.
 - With service sets or split documents, reads the target service's set and only the relevant split files, found through the indexes.
 - Keeps the PR in Draft and asks in PR comments while anything waits on a human decision. It marks the PR Ready for review only after the quality gates pass and automated checks are addressed.
 - After Ready for review, pushes once per batch of review fixes.
