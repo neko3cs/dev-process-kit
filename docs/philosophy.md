@@ -66,7 +66,7 @@ A specification change that the user asks for in the middle of implementation is
 
 Each Issue gets exactly one implementation PR. While anything still waits on a human decision, the PR stays in Draft, so that by the time it is merged, the Issue is complete.
 
-An Issue too large to review as one implementation PR is split into child Issues, not into several PRs for the same Issue. The parent Issue is still designed in a single design PR, so the whole specification is agreed and frozen at once; that design PR proposes how to split the work, and each child covers its own acceptance criteria. Each child then gets its own implementation PR, and the parent is complete once every child is merged.
+An Issue holds one requirement. A request with several requirements that each deliver value on their own becomes several Issues, not one Issue with several PRs or a parent with child Issues; a child read on its own does not say which requirement it serves. The split is decided by requirement, not by the amount of work. The issue skill asks before filing such a split, and the design skill stops on an Issue that still holds several requirements.
 
 ## Tests are defined in test code
 
