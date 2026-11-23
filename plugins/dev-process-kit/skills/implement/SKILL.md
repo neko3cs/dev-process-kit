@@ -1,7 +1,6 @@
 ---
 name: implement
 description: Implement a GitHub issue from requirements.md, specification.md, and architecture.md on one implementation PR. Scope work by matching the issue and design PR changes to the design docs, implement with test-first unit tests (TDD) plus integration and scenario tests and verify against the design docs, mark ready for review, and address implementation PR reviews. Commit, push, and create or update the PR without per-operation approval. Do not write design docs. When the external specification in the design docs is missing, undecided, or wrong, do not implement on assumptions; stop, tell the user what is missing, and ask them to run /dev-process-kit:design for a separate design PR, then resume after it is merged (if the user does not want design docs, ask in chat instead). Decide internal design details not covered by the docs without stopping, and express them as unit tests. Run only when the user explicitly invokes this skill by name ("/dev-process-kit:implement 4", "$dev-process-kit:implement 4"); do not select it for general requests such as "fix issue #4" or "#4を直して".
-license: MIT
 disable-model-invocation: true
 ---
 

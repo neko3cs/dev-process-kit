@@ -90,4 +90,4 @@ copilot plugin update dev-process-kit
 
 ## ライセンス
 
-[MIT](LICENSE)
+[MIT](LICENSE)。ただし、ユニットテストの根拠として置いている[講演の要約](plugins/dev-process-kit/skills/implement/references/tdd-bootcamp-2020-wada.md)は対象外です。第三者の講演を要約したもので、内容の権利は登壇者と主催者にあります。

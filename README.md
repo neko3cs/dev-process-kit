@@ -90,4 +90,4 @@ copilot plugin update dev-process-kit
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE), except for [the talk summary](plugins/dev-process-kit/skills/implement/references/tdd-bootcamp-2020-wada.md) used as background for unit tests. That file summarizes a third-party talk, and its content belongs to the speaker and the organizer.
