@@ -128,6 +128,7 @@ It runs only when called by name. A general request such as "fix #12" does not s
 - With service sets or split documents, reads the target service's set and only the relevant split files, found through the indexes.
 - Keeps the PR in Draft and asks in PR comments while anything waits on a human decision. It marks the PR Ready for review only after the quality gates pass and automated checks are addressed. When neither repository rules nor your instructions define a quality gate, it runs the existing tests, builds, type checks, and linters that can be executed locally, separates what it ran from what it did not run in the PR body's verification section, and suggests defining a quality gate in `architecture.md` via a PR comment when needed.
 - After Ready for review, pushes once per batch of review fixes.
+- Follows the repository's rules or your instructions for how to incorporate the integration branch into the implementation branch (merge or rebase), defaulting to merge. After a rebase, it pushes with `--force-with-lease` and avoids rebasing or force-pushing after Ready for review unless required by repository rules or your instructions.
 
 ### What it does not do
 

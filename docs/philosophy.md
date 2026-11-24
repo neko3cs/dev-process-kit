@@ -113,7 +113,7 @@ This plugin decides the flow of the phases and the rules that keep the flow inta
 | Requests are filed as Issues | How Issue templates are structured |
 | Design is recorded in three design documents | Where the design documents live (existing conventions win) |
 | Merging the design PR freezes the specification | PR format and templates |
-| One implementation PR per Issue | Branch names and how branches are created |
+| One implementation PR per Issue | Branch names, how branches are created, and how the integration branch is incorporated |
 | The PR stays in Draft while a decision is pending | Coding conventions |
 | External specification problems found during implementation stop it and are fixed in a separate design PR; internal design is decided in unit tests | Test frameworks and tools |
 | Which design document is verified at which level | How quality gates are run |
