@@ -28,12 +28,12 @@ usage() {
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --list) LIST_ONLY=1; shift ;;
-    --harness) HARNESS="${2:-}"; shift 2 ;;
-    --scenario) SCENARIO_ID="${2:-}"; shift 2 ;;
-    --skill) SKILL_FILTER="${2:-}"; shift 2 ;;
+    --harness) [[ $# -ge 2 ]] || { echo "Error: --harness requires a value" >&2; usage >&2; exit 2; }; HARNESS="$2"; shift 2 ;;
+    --scenario) [[ $# -ge 2 ]] || { echo "Error: --scenario requires a value" >&2; usage >&2; exit 2; }; SCENARIO_ID="$2"; shift 2 ;;
+    --skill) [[ $# -ge 2 ]] || { echo "Error: --skill requires a value" >&2; usage >&2; exit 2; }; SKILL_FILTER="$2"; shift 2 ;;
     --all) RUN_ALL=1; shift ;;
     --setup-only) SETUP_ONLY=1; shift ;;
-    --out-dir) OUT_DIR="${2:-}"; shift 2 ;;
+    --out-dir) [[ $# -ge 2 ]] || { echo "Error: --out-dir requires a value" >&2; usage >&2; exit 2; }; OUT_DIR="$2"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
   esac
@@ -72,6 +72,7 @@ if [[ -z "$OUT_DIR" ]]; then
   OUT_DIR="${TMPDIR:-/tmp}/dev-process-kit-evals/$STAMP"
 fi
 mkdir -p "$OUT_DIR"
+OUT_DIR="$(cd "$OUT_DIR" && pwd)"
 
 # Resolve selected scenario IDs
 SCENARIO_IDS="$(python3 - "$SCRIPT_DIR/scenarios" "$SCENARIO_ID" "$SKILL_FILTER" <<'PY'
@@ -101,14 +102,24 @@ PY
 # Prepare isolated harness homes for codex / copilot once per run
 CODEX_TMP_HOME=""
 COPILOT_TMP_HOME=""
+COPILOT_AUTH_TOKEN=""
 if [[ "$SETUP_ONLY" -eq 0 && "$HARNESS" == "codex" ]]; then
   CODEX_TMP_HOME="$OUT_DIR/.codex-home"
   mkdir -p "$CODEX_TMP_HOME"
+  SRC_CODEX_AUTH="${CODEX_HOME:-$HOME/.codex}/auth.json"
+  if [[ -f "$SRC_CODEX_AUTH" ]]; then
+    cp "$SRC_CODEX_AUTH" "$CODEX_TMP_HOME/auth.json"
+    chmod 600 "$CODEX_TMP_HOME/auth.json"
+  fi
   CODEX_HOME="$CODEX_TMP_HOME" codex plugin marketplace add "$REPO_ROOT" >/dev/null
   CODEX_HOME="$CODEX_TMP_HOME" codex plugin add dev-process-kit@dev-process-kit >/dev/null
 elif [[ "$SETUP_ONLY" -eq 0 && "$HARNESS" == "copilot" ]]; then
   COPILOT_TMP_HOME="$OUT_DIR/.copilot-home"
   mkdir -p "$COPILOT_TMP_HOME"
+  # Capture real gh auth token before PATH is overridden with mock gh
+  if [[ -z "${COPILOT_GITHUB_TOKEN:-}" && -z "${GH_TOKEN:-}" && -z "${GITHUB_TOKEN:-}" ]]; then
+    COPILOT_AUTH_TOKEN="$(gh auth token 2>/dev/null || true)"
+  fi
   COPILOT_HOME="$COPILOT_TMP_HOME" copilot plugin marketplace add "$REPO_ROOT" >/dev/null
   COPILOT_HOME="$COPILOT_TMP_HOME" copilot plugin install dev-process-kit@dev-process-kit >/dev/null
 fi
@@ -116,7 +127,9 @@ fi
 TOTAL=0
 FAILED=0
 
-while IFS=$'\t' read -r SKILL SID; do
+while IFS=$'\t' read -r -u 3 SKILL SID; do
+  SKILL="${SKILL%$'\r'}"
+  SID="${SID%$'\r'}"
   TOTAL=$((TOTAL + 1))
   RUN_DIR="$OUT_DIR/$SID"
   mkdir -p "$RUN_DIR/bin" "$RUN_DIR/repo"
@@ -193,9 +206,11 @@ for idx, cspec in enumerate(main_after):
 checkout = setup.get("checkout", "main")
 git("checkout", checkout)
 
-# Record initial remote refs to detect pushes later
+# Record initial remote refs and HEAD to detect pushes and edits later
 refs = subprocess.check_output(["git", "--git-dir", str(remote), "show-ref"], text=True)
 (run_dir / "initial-remote-refs.txt").write_text(refs, encoding="utf-8")
+head_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip()
+(run_dir / "initial-head.txt").write_text(head_sha, encoding="utf-8")
 
 prefix = "$dev-process-kit:" if harness == "codex" else "/dev-process-kit:"
 inv = f"{prefix}{skill}"
@@ -203,6 +218,7 @@ args_str = sc["prompt_args"].strip()
 print(f"{inv} {args_str}" if args_str else inv)
 PY
 )"
+PROMPT="${PROMPT%$'\r'}"
 
   cat > "$RUN_DIR/bin/gh" <<EOF
 #!/usr/bin/env bash
@@ -211,6 +227,18 @@ export EVAL_GH_LOG="$RUN_DIR/gh-calls.jsonl"
 exec python3 "$SCRIPT_DIR/lib/mock-gh.py" "\$@"
 EOF
   chmod +x "$RUN_DIR/bin/gh"
+
+  # On Windows (Git Bash / MSYS2 / Cygwin), also provide gh.cmd for PowerShell/cmd harnesses
+  if command -v cygpath >/dev/null 2>&1; then
+    WIN_RUN_DIR="$(cygpath -w "$RUN_DIR")"
+    WIN_MOCK_GH="$(cygpath -w "$SCRIPT_DIR/lib/mock-gh.py")"
+    cat > "$RUN_DIR/bin/gh.cmd" <<EOF
+@echo off
+set "EVAL_GH_STATE=$WIN_RUN_DIR\\gh-state.json"
+set "EVAL_GH_LOG=$WIN_RUN_DIR\\gh-calls.jsonl"
+python3 "$WIN_MOCK_GH" %*
+EOF
+  fi
 
   echo "============================================================"
   echo "Scenario: $SID ($SKILL)"
@@ -234,13 +262,21 @@ EOF
           "$PROMPT"
         ;;
       codex)
-        CODEX_HOME="$CODEX_TMP_HOME" codex exec "$PROMPT"
+        CODEX_HOME="$CODEX_TMP_HOME" codex exec \
+          --dangerously-bypass-approvals-and-sandbox \
+          "$PROMPT"
         ;;
       copilot)
-        COPILOT_HOME="$COPILOT_TMP_HOME" copilot -p "$PROMPT"
+        if [[ -n "$COPILOT_AUTH_TOKEN" ]]; then
+          export COPILOT_GITHUB_TOKEN="$COPILOT_AUTH_TOKEN"
+        fi
+        COPILOT_HOME="$COPILOT_TMP_HOME" copilot \
+          -p "$PROMPT" \
+          --allow-all-tools \
+          --allow-all-paths
         ;;
     esac
-  ) > "$RUN_DIR/response.txt" 2> "$RUN_DIR/stderr.txt"
+  ) < /dev/null > "$RUN_DIR/response.txt" 2> "$RUN_DIR/stderr.txt"
   EXIT_CODE=$?
   set -e
 
@@ -288,12 +324,19 @@ if stay_branch:
 
 protected = checks.get("git_must_not_modify", [])
 if protected:
-    status_out = subprocess.check_output(["git", "status", "--porcelain"], cwd=repo, text=True)
-    diff_out = subprocess.check_output(["git", "diff", "--name-only", "origin/main...HEAD"], cwd=repo, text=True)
+    initial_head = (run_dir / "initial-head.txt").read_text(encoding="utf-8").strip()
+    status_out = subprocess.check_output(["git", "status", "--porcelain", "-uall"], cwd=repo, text=True)
+    diff_out = subprocess.check_output(["git", "diff", "--name-only", initial_head, "HEAD"], cwd=repo, text=True)
     touched = set()
     for line in status_out.splitlines():
         if len(line) > 3:
-            touched.add(line[3:].strip())
+            path_part = line[3:].strip()
+            if " -> " in path_part:
+                old_p, new_p = path_part.split(" -> ", 1)
+                touched.add(old_p.strip().strip('"'))
+                touched.add(new_p.strip().strip('"'))
+            else:
+                touched.add(path_part.strip('"'))
     for line in diff_out.splitlines():
         if line.strip():
             touched.add(line.strip())
@@ -324,7 +367,7 @@ PY
   then
     FAILED=$((FAILED + 1))
   fi
-done <<< "$SCENARIO_IDS"
+done 3<<< "$SCENARIO_IDS"
 
 echo "============================================================"
 echo "Completed $TOTAL scenario(s). Automated check failures: $FAILED"
