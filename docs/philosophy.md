@@ -52,6 +52,8 @@ When a person reviews and merges the design PR, the specification is agreed and 
 
 When the code and the design documents disagree, the design documents win, and the difference is treated as a defect in the code. Users check the documents, not the code.
 
+When adopting this process in a repository that already has code, the design documents are still written as finished work, without pending-confirmation markers. Because current behavior read from the code has not yet been agreed on as the specification, the design PR body and comments distinguish it from newly chosen options and ask a person to confirm whether to ratify that behavior as the specification. Before ratification, a mismatch between that description and the code is treated as something to verify, not as a defect in the code. Once the design PR is merged, the documents are authoritative just like any other specification; if a difference from reverse-engineered descriptions turns up later, it is reported as an Issue so that a person with decision authority can decide whether to align the code with the documents or update the specification.
+
 ### When the specification changes, stop and go back upstream
 
 If a gap or an error in the specification turns up during implementation, the implementation PR does not settle on a provisional specification and carry on. Implementation stops, the user is told, and the specification is fixed in a separate design PR that the user starts with `dev-process-kit:design`. Implementation resumes only after that design PR is merged and the specification is frozen again.
