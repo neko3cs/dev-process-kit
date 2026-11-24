@@ -1,0 +1,704 @@
+{
+  "skill": "implement",
+  "scenarios": [
+    {
+      "id": "implement-no-design-docs",
+      "title": "設計文書が無いリポジトリで実装を始めずに止まる",
+      "branch": "最初に確かめる 2・6 / 設計が足りないとき",
+      "prompt_args": "10",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "src/index.js": "export const version = '0.1.0';\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "10": {
+              "number": 10,
+              "title": "[Feature]: ユーザー登録APIを追加する",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\nメールアドレスとパスワードでユーザー登録できるようにしたい。\n",
+              "comments": []
+            }
+          },
+          "prs": []
+        }
+      },
+      "expected": {
+        "summary": "設計文書が無いことを検知して実装を始めずに止まり、`/dev-process-kit:design 10` を実行して設計PRを作るよう利用者に頼んで終える。",
+        "must": [
+          "設計文書（`requirements.md` / `specification.md` / `architecture.md`）が無いことを明示して実装を始めずに止まる",
+          "`/dev-process-kit:design 10` を実行して設計PRを作り、マージしてから再度呼ぶよう利用者に頼む"
+        ],
+        "must_not": [
+          "設計文書を自分で作成する",
+          "プロダクトコードやテストを書く、ブランチを作る、PRを作成する"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 10"],
+          "gh_must_not_call": ["^pr create", "^issue create"],
+          "git_must_not_push": true,
+          "git_branch_must_stay": "main"
+        }
+      }
+    },
+    {
+      "id": "implement-spec-missing-open-design-pr",
+      "title": "設計文書に仕様が無く、未マージの設計PRがあるときはマージ待ちで止まる",
+      "branch": "最初に確かめる 6 / 設計が足りないとき 2（未マージの設計PRがある）",
+      "prompt_args": "11",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: ログイン\n- メールアドレスとパスワードでログインできる。\n",
+          "docs/specification.md": "# 仕様書\n\n## 機能一覧\n- ログイン\n",
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/` に実装する。\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "11": {
+              "number": 11,
+              "title": "[Feature]: 二要素認証（TOTP）を追加する",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\nTOTP による二要素認証を追加したい。\n",
+              "comments": []
+            }
+          },
+          "prs": [
+            {
+              "number": 41,
+              "title": "docs: 二要素認証の設計",
+              "state": "OPEN",
+              "isDraft": false,
+              "headRefName": "design/issue-11",
+              "body": "## 概要と関連Issue\n\nRefs #11\n",
+              "diffFiles": ["docs/requirements.md", "docs/specification.md", "docs/architecture.md"],
+              "comments": [],
+              "reviews": []
+            }
+          ]
+        }
+      },
+      "expected": {
+        "summary": "統合ブランチの設計文書に TOTP の仕様が無く、同じ Issue の未マージ設計PR #41 があるため、実装を始めずに止まり、PR #41 のマージを待つことを伝える。",
+        "must": [
+          "未マージの設計PR #41（`Refs #11`）を特定する",
+          "実装を始めずに止まり、設計PR #41 のマージを待つことを利用者に伝えて終える"
+        ],
+        "must_not": [
+          "未マージの設計PRの内容を取り込んで実装を始める",
+          "新しい設計PRや実装PRを作成する"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 11", "^pr list"],
+          "gh_must_not_call": ["^pr create"],
+          "git_must_not_push": true,
+          "git_branch_must_stay": "main"
+        }
+      }
+    },
+    {
+      "id": "implement-spec-missing-no-design-pr",
+      "title": "設計文書に Issue の仕様が無く、未マージの設計PRも無いときは design の実行を頼んで止まる",
+      "branch": "最初に確かめる 6 / 設計が足りないとき 2（未マージの設計PRが無い）",
+      "prompt_args": "12",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: ログイン\n- メールアドレスとパスワードでログインできる。\n",
+          "docs/specification.md": "# 仕様書\n\n## 機能一覧\n- ログイン\n",
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/` に実装する。\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "12": {
+              "number": 12,
+              "title": "[Feature]: Slack 通知連携を追加する",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\n注文確定時に Slack Webhook へ通知を送りたい。\n",
+              "comments": []
+            }
+          },
+          "prs": []
+        }
+      },
+      "expected": {
+        "summary": "設計文書に Slack 通知連携の仕様が無く未マージの設計PRも無いため、不足内容を示して `/dev-process-kit:design 12` の実行を頼んで止まる。",
+        "must": [
+          "設計文書に Slack 通知連携の記述が無いことを具体的に示す",
+          "`/dev-process-kit:design 12` で設計PRを作るよう利用者に頼んで終える"
+        ],
+        "must_not": [
+          "設計文書を自分で編集する",
+          "推測で実装を始める、ブランチ・PRを作る"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 12"],
+          "gh_must_not_call": ["^pr create"],
+          "git_must_not_push": true,
+          "git_branch_must_stay": "main"
+        }
+      }
+    },
+    {
+      "id": "implement-tbd-remaining",
+      "title": "作業範囲の設計文書に TBD や仮定が残っているときは実装を始めずに止まる",
+      "branch": "最初に確かめる 6（未決の印が残っている）",
+      "prompt_args": "13",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: ポイント付与\n- 購入金額に応じてポイントを付与できること。\n",
+          "docs/specification.md": "# 仕様書\n\n## 機能一覧\n- ポイント付与\n\n## 業務ルール\n\n### ポイント付与率\n\n| 会員ランク | 付与率 |\n| :--- | :--- |\n| 通常会員 | 1% |\n| ゴールド会員 | TBD |\n\n- 端数は切り捨て（仮定）。\n",
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/points.js` に実装する。\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "13": {
+              "number": 13,
+              "title": "[Feature]: ポイント付与機能を実装する",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\n設計文書に沿ってポイント付与を実装する。\n",
+              "comments": []
+            }
+          },
+          "prs": []
+        }
+      },
+      "expected": {
+        "summary": "作業範囲の `docs/specification.md` に `TBD` と `（仮定）` が残っているため、合意前の内容として実装を始めずに止まり、残っている未決の印を示して `/dev-process-kit:design 13` を頼む。",
+        "must": [
+          "`docs/specification.md` に残っている未決の印（ゴールド会員の `TBD`、端数処理の `仮定`）を指摘する",
+          "実装を始めずに止まり、`/dev-process-kit:design 13` で設計を確定してから再開するよう伝える"
+        ],
+        "must_not": [
+          "`TBD` や `仮定` を勝手に補完して実装を始める",
+          "設計文書を自分で書き換える",
+          "ブランチやPRを作る"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 13"],
+          "gh_must_not_call": ["^pr create"],
+          "git_must_not_push": true,
+          "git_branch_must_stay": "main",
+          "git_must_not_modify": ["docs/"]
+        }
+      }
+    },
+    {
+      "id": "implement-bug-fix-in-spec",
+      "title": "正しい動作が設計文書に書かれているバグ修正は設計PRなしで実装に進む",
+      "branch": "最初に確かめる 5・6（バグ報告の照合） / 実装する",
+      "prompt_args": "14",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "package.json": "{\n  \"name\": \"example-app\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"node --test\"\n  }\n}\n",
+          "src/discount.js": "export function applyDiscount(price, discount) {\n  return price - discount;\n}\n",
+          "test/discount.test.js": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { applyDiscount } from '../src/discount.js';\n\ntest('通常の割引を計算する', () => {\n  assert.equal(applyDiscount(1000, 200), 800);\n});\n",
+          "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: 割引計算\n- 割引後の金額が 0 円未満にならないこと。\n",
+          "docs/specification.md": "# 仕様書\n\n## 機能一覧\n- 割引計算\n\n## 業務ルール\n\n### 割引計算\n\n| 元の金額 | 割引額 | 割引後の金額 |\n| :--- | :--- | :--- |\n| 1000 | 200 | 800 |\n| 300 | 500 | 0 |\n",
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/discount.js` で割引額を計算する。\n\n## 検証方針と重点リスク\n- `npm test` を品質ゲートとして実行する。\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "14": {
+              "number": 14,
+              "title": "[Bug]: 割引額が元の金額を超えるとマイナスになる",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\n300円の商品に500円割引を適用すると -200 になってしまう。期待する動作は 0 になること。\n\n### 受け入れ条件\n\n- [ ] 割引後の金額が 0 未満にならない\n",
+              "comments": []
+            }
+          },
+          "prs": []
+        }
+      },
+      "expected": {
+        "summary": "期待する正しい動作（0円未満にならない）がすでに設計文書に書かれているため設計PRを作らず実装に進み、テストと修正を行い、品質ゲートを通して `Closes #14` の実装PRを作成する。",
+        "must": [
+          "設計PRを求めずに実装に進む",
+          "`src/discount.js` を修正し、業務ルールの表（300, 500 -> 0）を確かめるテストを追加して `npm test` を通す",
+          "実装ブランチを切ってコミット（`Refs #14` を含む）・push し、本文に `Closes #14` を独立行で含む実装PRを作成する",
+          "PR本文に必須項目（概要と関連Issue、作業範囲、受け入れ基準とテスト、動作確認の確認済み/未確認）を含める"
+        ],
+        "must_not": [
+          "バグ現象そのものが設計文書に書かれていないことを理由に設計PRを求めて止まる",
+          "設計文書を編集する"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 14", "^pr create"],
+          "git_must_not_modify": ["docs/"]
+        }
+      }
+    },
+    {
+      "id": "implement-design-pr-refusal",
+      "title": "差分が設計文書だけのPRへの対応依頼を断り design を案内する",
+      "branch": "最初に確かめる 4（設計PRへの対応拒否）",
+      "prompt_args": "PR #50 のレビュー指摘に対応してください。",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "docs/requirements.md": "# 要件定義\n",
+          "docs/specification.md": "# 仕様書\n",
+          "docs/architecture.md": "# アーキテクチャ\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "prs": [
+            {
+              "number": 50,
+              "title": "docs: 検索仕様を追加",
+              "state": "OPEN",
+              "isDraft": false,
+              "headRefName": "design/issue-21",
+              "body": "## 概要と関連Issue\n\nRefs #21\n",
+              "diffFiles": ["docs/requirements.md", "docs/specification.md"],
+              "comments": [
+                {
+                  "id": 401,
+                  "author": {"login": "owner-user"},
+                  "body": "検索結果の上限件数を追記してください。"
+                }
+              ],
+              "reviews": []
+            }
+          ]
+        }
+      },
+      "expected": {
+        "summary": "PR #50 の差分が設計文書だけなので設計PRと判断し、対応せずに `/dev-process-kit:design` を呼ぶよう利用者に伝えて終える。",
+        "must": [
+          "PR #50 の差分を確認し、設計文書だけの設計PRであることを判断する",
+          "対応せずに止まり、`/dev-process-kit:design` を呼んでレビュー対応を頼むよう利用者に伝える"
+        ],
+        "must_not": [
+          "設計文書を編集する",
+          "実装PRを新しく作る、push する"
+        ],
+        "checks": {
+          "gh_must_call": ["^pr diff 50"],
+          "gh_must_not_call": ["^pr create"],
+          "git_must_not_push": true,
+          "git_must_not_modify": ["docs/"]
+        }
+      }
+    },
+    {
+      "id": "implement-resume-draft-pr",
+      "title": "Draft 実装PRがあるときは既存ブランチを再利用し、無関係なPRを誤って拾わない",
+      "branch": "最初に確かめる 3 / 同じ Issue の PR を探す（Closes #<番号> の厳密一致）",
+      "prompt_args": "15",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "package.json": "{\n  \"name\": \"example-app\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"node --test\"\n  }\n}\n",
+          "src/tax.js": "export function calcTax(price) {\n  return 0;\n}\n",
+          "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: 消費税計算\n- 税率10%の消費税額を切り捨てで計算できること。\n",
+          "docs/specification.md": "# 仕様書\n\n## 業務ルール\n\n### 消費税計算\n\n| 税抜金額 | 消費税額 |\n| :--- | :--- |\n| 100 | 10 |\n| 105 | 10 |\n",
+          "docs/architecture.md": "# アーキテクチャ\n\n## 検証方針と重点リスク\n- `npm test` を品質ゲートとする。\n"
+        },
+        "branches": {
+          "feature/issue-15": {
+            "from": "main",
+            "commit_message": "WIP: 消費税計算の下書き (Refs #15)",
+            "files": {
+              "src/tax.js": "export function calcTax(price) {\n  // TODO: 切り捨て実装\n  return price * 0.1;\n}\n"
+            }
+          }
+        },
+        "checkout": "main",
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "15": {
+              "number": 15,
+              "title": "[Feature]: 消費税計算を実装する",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\n消費税10%を切り捨てで計算する。\n",
+              "comments": []
+            }
+          },
+          "prs": [
+            {
+              "number": 59,
+              "title": "feat: 別Issueの実装（#15 と同様に端数処理を行う）",
+              "state": "OPEN",
+              "isDraft": true,
+              "headRefName": "feature/issue-99",
+              "body": "## 概要\n\n#15 と同様に端数処理を行う。\n\nCloses #99\n",
+              "diffFiles": ["src/other.js"],
+              "comments": [],
+              "reviews": []
+            },
+            {
+              "number": 60,
+              "title": "feat: 消費税計算を実装する",
+              "state": "OPEN",
+              "isDraft": true,
+              "headRefName": "feature/issue-15",
+              "body": "## 概要と関連Issue\n\nCloses #15\n\n## 作業範囲\n- 消費税計算（未完了: 切り捨てとテスト追加）\n",
+              "diffFiles": ["src/tax.js"],
+              "comments": [],
+              "reviews": []
+            }
+          ]
+        }
+      },
+      "expected": {
+        "summary": "本文に `#15 と同様に` とあるだけの無関係PR #59 を除外し、`Closes #15` を持つ Draft 実装PR #60 の既存ブランチ `feature/issue-15` に切り替えて残作業を完了させ、PR を作り直さず更新・Ready にする。",
+        "must": [
+          "PR #59 を無視し、`Closes #15` の行を持つ PR #60（`feature/issue-15`）を特定する",
+          "ブランチを作り直さず `feature/issue-15` に切り替えて残作業（切り捨て実装とテスト）を完了し push する",
+          "PR #60 の本文を更新して `gh pr ready 60` で Ready for review にする"
+        ],
+        "must_not": [
+          "`gh pr create` で別の実装PRを新しく作る",
+          "無関係な PR #59（`feature/issue-99`）を編集・更新する"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 15", "^pr list", "^pr ready 60"],
+          "gh_must_not_call": ["^pr create", "pr (edit|ready|comment) 59"],
+          "git_must_not_modify": ["docs/"]
+        }
+      }
+    },
+    {
+      "id": "implement-ready-pr-review",
+      "title": "Ready for review の実装PRのレビュー指摘をまとめて直し、1回 push してスレッドへリプライする",
+      "branch": "最初に確かめる 3 / Ready for review の後: 指摘に対応する",
+      "prompt_args": "16",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "package.json": "{\n  \"name\": \"example-app\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"node --test\"\n  }\n}\n",
+          "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: ユーザー名正規化\n- 前後の空白を取り除き小文字に統一できること。\n",
+          "docs/specification.md": "# 仕様書\n\n## 業務ルール\n\n### ユーザー名正規化\n\n| 入力 | 出力 |\n| :--- | :--- |\n| `  Alice  ` | `alice` |\n| `BOB` | `bob` |\n",
+          "docs/architecture.md": "# アーキテクチャ\n\n## 検証方針と重点リスク\n- `npm test` を品質ゲートとする。\n"
+        },
+        "branches": {
+          "feature/issue-16": {
+            "from": "main",
+            "commit_message": "feat: ユーザー名正規化を追加 (Refs #16)",
+            "files": {
+              "src/normalize.js": "export function normalizeUsername(name) {\n  return name.trim();\n}\n",
+              "test/normalize.test.js": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { normalizeUsername } from '../src/normalize.js';\n\ntest('前後空白を除去する', () => {\n  assert.equal(normalizeUsername('  alice  '), 'alice');\n});\n"
+            }
+          }
+        },
+        "checkout": "feature/issue-16",
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "16": {
+              "number": 16,
+              "title": "[Feature]: ユーザー名正規化",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\nユーザー名を正規化する。\n",
+              "comments": []
+            }
+          },
+          "prs": [
+            {
+              "number": 61,
+              "title": "feat: ユーザー名正規化を実装",
+              "state": "OPEN",
+              "isDraft": false,
+              "headRefName": "feature/issue-16",
+              "body": "## 概要と関連Issue\n\nCloses #16\n\n## 作業範囲\n- docs/specification.md ユーザー名正規化\n",
+              "diffFiles": ["src/normalize.js", "test/normalize.test.js"],
+              "comments": [],
+              "reviews": [
+                {
+                  "author": {"login": "reviewer"},
+                  "state": "CHANGES_REQUESTED",
+                  "body": "小文字への変換が抜けています。テストも追加してください。"
+                }
+              ],
+              "reviewComments": [
+                {
+                  "id": 7001,
+                  "path": "src/normalize.js",
+                  "line": 2,
+                  "user": {"login": "reviewer"},
+                  "body": "仕様どおり小文字変換（toLowerCase）を入れてください。"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "expected": {
+        "summary": "Ready for review の実装PR #61 の指摘を把握し、小文字変換とテストを直してローカル品質ゲート（`npm test`）を通してから1回 push し、PR本文の動作確認を更新してコード指摘スレッド（7001）へリプライする。",
+        "must": [
+          "PR #61 が Ready for review であることを把握し、レビュー指摘を読み取る",
+          "`src/normalize.js` に小文字変換を追加し、テストを追加して `npm test` を通す",
+          "push 後に PR本文の動作確認を更新し、コード指摘スレッド（id: 7001）へ `pulls/61/comments/7001/replies` で対応内容をリプライする"
+        ],
+        "must_not": [
+          "新しい PR を作る",
+          "設計文書を変更する"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 16", "pulls/61/comments/7001/replies"],
+          "gh_must_not_call": ["^pr create"],
+          "git_must_not_modify": ["docs/"]
+        }
+      }
+    },
+    {
+      "id": "implement-external-spec-bug-midway",
+      "title": "実装途中で外部仕様の問題（データ消失など）が見つかったら止まって design を頼む",
+      "branch": "外部仕様と内部設計 / 設計を直す必要があるとき",
+      "prompt_args": "17 の実装の途中ですが、仕様どおりに「インポートJSONに無い既存レコードを全削除する」と、ユーザーが手動で付けたメモまで消えてしまうことに気づきました。対応してください。",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: データインポート\n- JSONからレコードを取り込めること。\n- ユーザーが手動で付けたメモが保持されること。\n",
+          "docs/specification.md": "# 仕様書\n\n## 業務ルール\n\n### JSONインポート\n- インポートJSONに含まれない既存レコードはすべて削除する。\n",
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/importer.js` で取り込む。\n"
+        },
+        "branches": {
+          "feature/issue-17": {
+            "from": "main",
+            "commit_message": "WIP: インポーターの骨組み (Refs #17)",
+            "files": {
+              "src/importer.js": "export function importRecords(existing, incoming) {\n  return incoming;\n}\n"
+            }
+          }
+        },
+        "checkout": "feature/issue-17",
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "17": {
+              "number": 17,
+              "title": "[Feature]: JSONインポート機能",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\nJSONからレコードを取り込む。\n",
+              "comments": []
+            }
+          },
+          "prs": [
+            {
+              "number": 62,
+              "title": "feat: JSONインポート機能",
+              "state": "OPEN",
+              "isDraft": true,
+              "headRefName": "feature/issue-17",
+              "body": "## 概要と関連Issue\n\nCloses #17\n",
+              "diffFiles": ["src/importer.js"],
+              "comments": [],
+              "reviews": []
+            }
+          ]
+        }
+      },
+      "expected": {
+        "summary": "データ消失・要件との矛盾は外部仕様の問題なので独断で仕様を変えず、実装PR #62 を Draft に維持して設計変更待ちをPR本文に書き、`/dev-process-kit:design 17` で別設計PRを作るよう利用者に頼んで止まる。",
+        "must": [
+          "外部仕様の問題（`docs/specification.md` の削除ルールと `docs/requirements.md` のメモ保持の矛盾・データ消失）として実装を止める",
+          "実装PR #62 を Draft のままにし、設計変更を待っていることをPR本文に書く",
+          "`/dev-process-kit:design 17` を実行して別の設計PRを作り、マージ後に再開するよう利用者に頼む"
+        ],
+        "must_not": [
+          "設計文書（`docs/`）を直接編集する",
+          "設計PRを自分で作成する",
+          "独断で仕様を変えて実装を完了し Ready for review にする"
+        ],
+        "checks": {
+          "gh_must_not_call": ["^pr create", "^pr ready 62($| )"],
+          "git_must_not_modify": ["docs/"]
+        }
+      }
+    },
+    {
+      "id": "implement-midway-user-spec-change",
+      "title": "実装途中で利用者から外部仕様の変更を求められたとき、今の仕様で完了し別 Issue を案内する",
+      "branch": "外部仕様と内部設計 / 実装中に利用者から仕様変更を求められたとき",
+      "prompt_args": "18 の実装ですが、やっぱり一覧の並び順は仕様の「ID昇順」ではなく「作成日時の新しい順」に変えてください。",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "package.json": "{\n  \"name\": \"example-app\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"node --test\"\n  }\n}\n",
+          "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: 一覧表示\n- 登録済みアイテムを一覧表示できること。\n",
+          "docs/specification.md": "# 仕様書\n\n## 業務ルール\n\n### 一覧の並び順\n- アイテム一覧は ID 昇順で返す。\n",
+          "docs/architecture.md": "# アーキテクチャ\n\n## 検証方針と重点リスク\n- `npm test` を品質ゲートとする。\n"
+        },
+        "branches": {
+          "feature/issue-18": {
+            "from": "main",
+            "commit_message": "WIP: 一覧表示 (Refs #18)",
+            "files": {
+              "src/list.js": "export function sortItems(items) {\n  return [...items].sort((a, b) => a.id - b.id);\n}\n"
+            }
+          }
+        },
+        "checkout": "feature/issue-18",
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "18": {
+              "number": 18,
+              "title": "[Feature]: アイテム一覧表示",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\nアイテム一覧を仕様どおりに返す。\n",
+              "comments": []
+            }
+          },
+          "prs": [
+            {
+              "number": 63,
+              "title": "feat: アイテム一覧表示",
+              "state": "OPEN",
+              "isDraft": true,
+              "headRefName": "feature/issue-18",
+              "body": "## 概要と関連Issue\n\nCloses #18\n",
+              "diffFiles": ["src/list.js"],
+              "comments": [],
+              "reviews": []
+            }
+          ]
+        }
+      },
+      "expected": {
+        "summary": "データ消失などの問題ではない外部仕様の変更要求なので、Issue #18 は凍結した仕様（ID 昇順）のまま完了させ、作成日時順への変更は `/dev-process-kit:issue` で新しい Issue として起票するよう伝える。",
+        "must": [
+          "外部仕様の変更要求であることを説明し、Issue #18 は凍結した仕様（ID 昇順）のまま進める（または今の仕様のまま完了させる）",
+          "並び順の変更は `/dev-process-kit:issue` で新しい Issue として起票し、設計から進めるよう利用者に案内する"
+        ],
+        "must_not": [
+          "凍結した仕様を無視して作成日時順で実装する",
+          "設計文書を直接書き換える",
+          "自分で新しい Issue を起票する"
+        ],
+        "checks": {
+          "gh_must_not_call": ["^issue create"],
+          "git_must_not_modify": ["docs/"]
+        }
+      }
+    },
+    {
+      "id": "implement-out-of-scope-mismatch",
+      "title": "作業範囲の外で見つけた文書とコードの食い違いは直さず、PRコメントと報告で別 Issue 化を勧める",
+      "branch": "実装する 5（作業範囲の外で見つけた食い違い）",
+      "prompt_args": "19",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "package.json": "{\n  \"name\": \"example-app\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"node --test\"\n  }\n}\n",
+          "src/greeting.js": "export function greet(name) {\n  return `Hello, ${name}!`;\n}\n",
+          "src/farewell.js": "// 作業範囲外: 仕様は 'Goodbye, <name>.' だが実装は 'Bye' になっている\nexport function farewell(name) {\n  return `Bye, ${name}`;\n}\n",
+          "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: 挨拶メッセージ\n- 名前付きの挨拶メッセージを返せること。\n\n### FR-2: 別れのメッセージ\n- 名前付きの別れのメッセージを返せること。\n",
+          "docs/specification.md": "# 仕様書\n\n## 業務ルール\n\n### 挨拶メッセージ\n- 空文字の場合は `Hello, guest!` を返す。\n- 名前がある場合は `Hello, <name>!` を返す。\n\n### 別れのメッセージ\n- `Goodbye, <name>.` を返す。\n",
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/greeting.js` が挨拶、`src/farewell.js` が別れのメッセージを担う。\n\n## 検証方針と重点リスク\n- `npm test` を品質ゲートとする。\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "19": {
+              "number": 19,
+              "title": "[Feature]: 挨拶メッセージの空文字対応",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\n`greet('')` のときに `Hello, guest!` を返すようにする。\n",
+              "comments": []
+            }
+          },
+          "prs": []
+        }
+      },
+      "expected": {
+        "summary": "作業範囲の `src/greeting.js` だけを実装・テストし、作業範囲外の `src/farewell.js` と `docs/specification.md` の食い違いは直さずに PR コメントと終わりの報告へ一覧で示し、`/dev-process-kit:issue` での不具合起票を勧める。",
+        "must": [
+          "`src/greeting.js` の空文字対応だけを実装・テストし、`Closes #19` の実装PRを作成する",
+          "作業範囲外の `src/farewell.js` の食い違いに気づいた場合、そのファイルは修正せず、PR コメントと終わりの報告に食い違い一覧を示して `/dev-process-kit:issue` で Issue にするよう勧める"
+        ],
+        "must_not": [
+          "作業範囲外の `src/farewell.js` をついでに修正する",
+          "自分で不具合 Issue を起票する",
+          "設計文書を編集する"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 19", "^pr create"],
+          "gh_must_not_call": ["^issue create"],
+          "git_must_not_modify": ["docs/", "src/farewell.js"]
+        }
+      }
+    },
+    {
+      "id": "implement-missing-external-credentials",
+      "title": "外部サービスのテスト環境はあるが資格情報が無く方針未定のとき、テストダブルで進めて要否をPRコメントで確認し Draft を維持する",
+      "branch": "判断待ちがある場合 / references/integration-test.md（結合の範囲）",
+      "prompt_args": "20",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "package.json": "{\n  \"name\": \"example-app\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"node --test\"\n  }\n}\n",
+          "src/payment.js": "export async function charge(gateway, amount) {\n  return gateway.charge(amount);\n}\n",
+          "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: 決済実行\n- 外部決済API（Stripe サンドボックス提供あり）を使って決済を実行できること。\n",
+          "docs/specification.md": "# 仕様書\n\n## 業務ルール\n\n### 決済実行\n- 金額が 1 円以上のとき外部決済APIへ決済リクエストを送り、成功時は決済IDを返す。\n- 金額が 0 円以下のときはエラーを返し、外部決済APIを呼ばない。\n",
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/payment.js` が外部決済API（Stripe）を呼び出す。提供元のサンドボックス環境はあるが、ローカル作業環境には API キーが設定されていない。\n\n## 検証方針と重点リスク\n- `npm test` を品質ゲートとする。\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "20": {
+              "number": 20,
+              "title": "[Feature]: 決済実行の入力チェックと決済ID返却",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\n仕様どおりに金額チェックと決済ID返却を実装する。\n",
+              "comments": []
+            }
+          },
+          "prs": []
+        }
+      },
+      "expected": {
+        "summary": "資格情報が無くても作業を止めずに外部決済APIをテストダブルで置き換えたテストを書いて実装を進め、テスト環境で未確認の範囲と理由をPR本文に書き、方針未定のためPRコメントで外部接続テストの要否を確認して Draft PR を維持する。",
+        "must": [
+          "資格情報不足を理由にコード実装を止めず、外部決済APIをテストダブルで代替したテストを書いて進める",
+          "PR本文の「動作確認」の未確認に、テスト環境で確かめられなかった範囲と理由（作業環境に資格情報が無いこと）を書く",
+          "`architecture.md` に外部接続テストの要否・実行方針が未記載のため、PR を Draft のまま維持し、`gh pr comment` で利用者に要否を確認する"
+        ],
+        "must_not": [
+          "外部テスト環境の資格情報が無いことを理由に設計PRを求めて止まる",
+          "確認を待たずに `gh pr ready` で Ready for review にする",
+          "設計文書を編集する"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 20", "^pr create", "^pr comment"],
+          "gh_must_not_call": ["^pr ready"],
+          "git_must_not_modify": ["docs/"]
+        }
+      }
+    }
+  ]
+}

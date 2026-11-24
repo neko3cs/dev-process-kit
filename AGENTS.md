@@ -21,10 +21,39 @@
 
 ## Commands
 
+**Required before opening a pull request:** run all of the following checks locally and confirm they pass before opening or marking a PR ready for review:
+
 ```sh
+.github/scripts/check-plugin-manifests.sh origin/main
 claude plugin validate .
 claude plugin validate plugins/dev-process-kit
+python3 evals/validate.py
+evals/run.sh --setup-only --all
 ```
+
+When a PR changes files under `plugins/dev-process-kit/skills/`, also run the regression evaluation scenarios for every modified skill (see below) before opening the PR.
 
 - When testing Codex installs, point `CODEX_HOME` at a temporary directory so that `codex plugin marketplace add` and `codex plugin add` don't write to the user's `~/.codex/config.toml`. `codex exec` cannot run slash commands; invoke skills as `$dev-process-kit:<skill>`.
 - When testing GitHub Copilot CLI installs, point `COPILOT_HOME` at a temporary directory for the same reason. `copilot -p "/dev-process-kit:<skill> ..."` invokes a skill non-interactively. A marketplace added from a local path is loaded live from that directory (nothing is copied), so `copilot plugin update` cannot be tested that way, and `file://` URLs are rejected.
+
+## Skill Regression Evaluations
+
+Regression scenarios for `issue`, `design`, and `implement` live under `evals/scenarios/*.json`. Running them is **required before opening a PR that modifies `plugins/dev-process-kit/skills/`** (run `--skill <skill>` for each modified skill, or `--all` before a release) to catch regressions in stop conditions, PR handling, and workflow rules:
+
+```sh
+# Validate scenario definitions and inspect the list
+python3 evals/validate.py
+evals/run.sh --list
+
+# Run scenarios for a changed skill, a single scenario, or the full suite
+evals/run.sh --harness claude --skill implement
+evals/run.sh --harness claude --scenario implement-no-design-docs
+evals/run.sh --harness claude --all
+
+# Also supports --harness codex and --harness copilot (uses isolated temp homes)
+evals/run.sh --harness codex --skill design
+```
+
+- `evals/run.sh` builds an isolated temporary git repository with a bare `origin` remote and a fixture-driven mock `gh` (`evals/lib/mock-gh.py`) under `${TMPDIR:-/tmp}/dev-process-kit-evals/`, so runs never touch real GitHub Issues/PRs or this repository. Use `--setup-only` to prepare the isolated workspace for manual interactive testing.
+- Confirm that all automated checks (`expected.checks`) pass, and review `response.txt` and `gh-calls.jsonl` against the `expected.must` / `expected.must_not` checklist printed by `run.sh`.
+- When fixing a skill bug or adding a new branch/stop condition to a `SKILL.md`, add a corresponding scenario to `evals/scenarios/<skill>.json`, verify it with `python3 evals/validate.py`, run that single scenario (`--scenario <id>`) *before* editing the skill to confirm it reproduces the failure, then re-run it after the edit to verify the change before running `--skill <skill>` for regressions. For wording-only refactors, running `--skill <skill>` after the edit is sufficient (compare against `main` on a single scenario only if a failure turns up).

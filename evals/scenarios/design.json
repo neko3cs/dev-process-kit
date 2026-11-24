@@ -1,0 +1,349 @@
+{
+  "skill": "design",
+  "scenarios": [
+    {
+      "id": "design-new-from-issue",
+      "title": "設計文書が無いリポジトリで Issue から新規設計PRを作成する",
+      "branch": "Issue から設計する / 新規作成モード / PRで確認する",
+      "prompt_args": "5",
+      "setup": {
+        "files": {
+          "README.md": "# 割引計算ツール\n\nECサイトの割引額を計算するライブラリです。\n",
+          "docs/README.md": "# Docs\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "5": {
+              "number": 5,
+              "title": "[Feature]: クーポン割引を計算する",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\n注文金額に対してクーポンコードに応じた割引額を計算したい。\n10%割引クーポンと500円引きクーポンに対応する。\n\n### 受け入れ条件\n\n- [ ] 割引後の金額が計算できる\n- [ ] 割引後の金額が0円未満にならない\n",
+              "comments": [
+                {
+                  "id": 101,
+                  "author": {"login": "owner-user"},
+                  "body": "端数処理（切り捨てか四捨五入か）は設計時に決めてください。"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "summary": "新規作成モードで `docs/` 配下に3ファイルを作成し、未決の端数処理は最も妥当な案を決まった仕様として書いて完成品にし、`Refs #5` の設計PRを作成してPRコメントで案を確認する。実装コードは書かない。",
+        "must": [
+          "`docs/requirements.md`・`docs/specification.md`・`docs/architecture.md` を作成する",
+          "テンプレートの HTML コメント（`<!-- -->`）、空の Mermaid ブロック、仮のままの ADR ひな型を残さない",
+          "文書内に `TBD`・`仮定`・`未承認`・`仮案` などの未決の印を書かない",
+          "`specification.md` の業務ルールに入力と期待結果の表を書く",
+          "作業ブランチでコミット・push し、`Refs #5` を独立行に含む設計PR（`Closes #5` ではない）を作成する",
+          "未決だった端数処理の選択について、`gh pr comment` で案・理由・代替案を示して質問する（確認待ちのため Draft PR とする）"
+        ],
+        "must_not": [
+          "プロダクトコードやテストコードを実装する",
+          "PR本文に `Closes #5` を書く",
+          "会話で事前承認を求めて PR を作らずに止まる"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 5", "^pr create", "^pr comment"],
+          "gh_must_not_call": ["^issue create"]
+        }
+      }
+    },
+    {
+      "id": "design-multi-req-issue-stop",
+      "title": "要件を複数含む Issue を渡されたとき設計を始めずに止まる",
+      "branch": "Issue から設計する / 要件を複数含む Issue",
+      "prompt_args": "8",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "8": {
+              "number": 8,
+              "title": "[Feature]: ユーザープロフィール編集と通知メール配信設定とCSVエクスポートを追加する",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\n以下をまとめて実装したい。\n1. ユーザーが自分のプロフィール（表示名・アイコン）を編集できる機能\n2. 通知メールの配信ON/OFFを項目ごとに設定できる機能\n3. 管理者が全ユーザー一覧をCSVエクスポートできる機能\n",
+              "comments": []
+            }
+          }
+        }
+      },
+      "expected": {
+        "summary": "単独で価値を届けられる要件が複数含まれていると判断し、設計を始めずに止まって要件ごとの分け方を示し、`/dev-process-kit:issue` で起票し直すよう利用者に頼む。",
+        "must": [
+          "設計を始めずに止まる",
+          "要件ごとの分け方（Issue ごとのタイトル案と要件）を示し、`/dev-process-kit:issue` で起票し直すよう利用者に頼む"
+        ],
+        "must_not": [
+          "設計ブランチ・設計文書・設計PRを作成する",
+          "Issue を自分で起票・編集・クローズする",
+          "親子 Issue での分割を提案する"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 8"],
+          "gh_must_not_call": ["^pr create", "^issue create", "^issue edit"],
+          "git_must_not_push": true,
+          "git_branch_must_stay": "main"
+        }
+      }
+    },
+    {
+      "id": "design-update-code-mismatch",
+      "title": "更新モードで文書と既存コードが食い違うとき、文書を正としてコードの不具合として報告する",
+      "branch": "手順: 更新モード 4（コードと文書の食い違い）",
+      "prompt_args": "14",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "src/shipping.js": "// 既存実装: 5000円以上で送料無料になっている（仕様は3000円以上）\nexport function calcShipping(total) {\n  if (total >= 5000) return 0;\n  return 500;\n}\n",
+          "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: 送料計算\n- 注文金額に応じた送料を計算できること。\n",
+          "docs/specification.md": "# 仕様書\n\n## 機能一覧\n- 送料計算\n\n## 業務ルール\n\n### 送料計算\n\n| 注文金額 | 送料 |\n| :--- | :--- |\n| 3000円未満 | 500円 |\n| 3000円以上 | 0円 |\n",
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/shipping.js` で送料を計算する。\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "14": {
+              "number": 14,
+              "title": "[Feature]: 沖縄・離島向けの追加送料を仕様に追加する",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\n沖縄・離島への配送では通常の送料に加えて1000円の追加送料を課す仕様を追加したい。\n既存の通常送料の条件は変更しない。\n",
+              "comments": []
+            }
+          }
+        }
+      },
+      "expected": {
+        "summary": "沖縄・離島の追加送料だけを設計文書に差分更新し、既存の `src/shipping.js`（5000円以上無料）と文書（3000円以上無料）の食い違いは文書を正としてコードの不具合としてPR本文と報告に一覧で示し、`/dev-process-kit:issue` での起票を勧める。",
+        "must": [
+          "既存の送料無料条件（3000円以上）をコード（5000円以上）に合わせて書き換えない",
+          "沖縄・離島の追加送料を設計文書に差分更新して設計PRを作成する",
+          "文書と `src/shipping.js` の食い違いをコードの不具合として PR本文の「食い違い」と終わりの報告に一覧で示し、`/dev-process-kit:issue` での Issue 起票を勧める"
+        ],
+        "must_not": [
+          "`src/shipping.js` を修正する",
+          "設計文書の3000円以上無料の仕様をコードに合わせて5000円以上に変える",
+          "自分で不具合 Issue を起票する"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 14", "^pr create"],
+          "gh_must_not_call": ["^issue create"],
+          "git_must_not_modify": ["src/shipping.js"]
+        }
+      }
+    },
+    {
+      "id": "design-from-existing-code-confirmation",
+      "title": "既存コードから設計文書を新規作成するとき、コード読み取り箇所を追認対象として区別する",
+      "branch": "手順: 新規作成モード 3〜4（既存コードの現状と仕様合意の区別）",
+      "prompt_args": "既存のコードから設計文書（requirements.md / specification.md / architecture.md）を新しく作成してください。",
+      "setup": {
+        "files": {
+          "README.md": "# Rate Limiter\n\nAPI のレート制限を行う小さなモジュールです。\n",
+          "src/limiter.py": "MAX_REQUESTS = 60\nWINDOW_SECONDS = 60\n\ndef is_allowed(count: int) -> bool:\n    return count < MAX_REQUESTS\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user"
+        }
+      },
+      "expected": {
+        "summary": "既存コードから3ファイルを完成品として作成し、文書内に確認待ちの印を残さず、PR本文でコード読み取りに基づく節を明示し、PRコメントで「現状を仕様として追認してよいか」を確認して Draft PR を維持する。",
+        "must": [
+          "3つの設計文書を完成品として作成し、`現状（コードから読み取り）` や `TBD` などの注記を文書内に残さない",
+          "PR本文に、どの節が既存コードの読み取りに基づくかを明記する",
+          "PRコメントで「読み取りが現状と合っているか、この現状を仕様として追認してよいか」を確認する",
+          "追認待ちのため PR を Draft として作成する"
+        ],
+        "must_not": [
+          "文書内に `現状（コードから読み取り）`・`仮定`・`未承認`・`TBD` を書く",
+          "`src/limiter.py` を変更する",
+          "確認を待たずに Ready for review にする"
+        ],
+        "checks": {
+          "gh_must_call": ["^pr create", "^pr comment"],
+          "gh_must_not_call": ["^pr ready"],
+          "git_must_not_modify": ["src/limiter.py"]
+        }
+      }
+    },
+    {
+      "id": "design-review-feedback",
+      "title": "設計PRへのレビュー指摘を既存ブランチ・PRで差分更新し、残存する未決印も外す",
+      "branch": "Issue から設計する / PRで確認する（レビュー対応と既存PR再利用）",
+      "prompt_args": "PR #20 のレビュー指摘を設計文書に反映してください。",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: パスワード設定\n- ユーザーがパスワードを設定できること。\n",
+          "docs/specification.md": "# 仕様書\n\n## 業務ルール\n\n### パスワード文字数\n- 最小文字数は 8 文字とする（仮定）。\n",
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- 認証モジュールで検証する。\n"
+        },
+        "branches": {
+          "design/issue-15": {
+            "from": "main",
+            "commit_message": "設計文書を更新",
+            "files": {
+              "docs/specification.md": "# 仕様書\n\n## 業務ルール\n\n### パスワード文字数\n- 最小文字数は 8 文字とする（仮定）。\n- 最大文字数は 64 文字とする。\n"
+            }
+          }
+        },
+        "checkout": "design/issue-15",
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "prs": [
+            {
+              "number": 20,
+              "title": "docs: パスワード文字数仕様の更新",
+              "state": "OPEN",
+              "isDraft": true,
+              "headRefName": "design/issue-15",
+              "body": "## 概要と関連Issue\n\nRefs #15\n\n## 変更した節\n- docs/specification.md\n",
+              "diffFiles": ["docs/specification.md"],
+              "comments": [
+                {
+                  "id": 301,
+                  "author": {"login": "owner-user"},
+                  "body": "最小文字数は 12 文字で確定してください。最大文字数は 128 文字でお願いします。"
+                }
+              ],
+              "reviews": []
+            }
+          ]
+        }
+      },
+      "expected": {
+        "summary": "既存の設計ブランチ `design/issue-15` と PR #20 を再利用して `docs/specification.md` を差分更新し、最小12文字・最大128文字に直して `（仮定）` の印を外し、回答経緯の注記を残さず push・PR本文更新を行う。",
+        "must": [
+          "既存のブランチ `design/issue-15` と PR #20 を再利用し、新しい PR を作らない",
+          "`docs/specification.md` を最小12文字・最大128文字に更新し、`（仮定）` を削除する",
+          "文書内に「レビューで変更」などの回答経緯の注記を足さない",
+          "変更をコミット・push し、PR #20 の本文を更新する"
+        ],
+        "must_not": [
+          "`gh pr create` で別の設計PRを新しく作る",
+          "文書内に `仮定` などの未決の印を残す"
+        ],
+        "checks": {
+          "gh_must_call": ["^pr view 20"],
+          "gh_must_not_call": ["^pr create"]
+        }
+      }
+    },
+    {
+      "id": "design-parallel-adr-conflict",
+      "title": "並行設計PRのマージで ADR 番号が重複したとき、未マージ側の ADR だけを振り直す",
+      "branch": "統合ブランチの取り込みと衝突の解消 / ADR 番号の重複解消",
+      "prompt_args": "設計PR #30 のブランチに main を取り込んで衝突と ADR 番号の重複を解消してください。",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "docs/architecture.md": "# アーキテクチャ\n\n## 設計判断と理由（ADR）\n\n### ADR-001: データ保存に SQLite を使う\n\n#### ステータス\nAccepted\n\n#### 意思決定内容\nローカル保存に SQLite を使う。\n\n#### 背景\n単一ファイルで運用できるため。\n\n#### 影響\n同時書き込みに制約がある。\n\n#### 他に検討したもの\nJSON ファイル保存。\n"
+        },
+        "branches": {
+          "design/issue-30": {
+            "from": "main",
+            "commit_message": "ADR-002（キャッシュ方式）を追加",
+            "files": {
+              "docs/architecture.md": "# アーキテクチャ\n\n## 設計判断と理由（ADR）\n\n### ADR-001: データ保存に SQLite を使う\n\n#### ステータス\nAccepted\n\n#### 意思決定内容\nローカル保存に SQLite を使う。\n\n#### 背景\n単一ファイルで運用できるため。\n\n#### 影響\n同時書き込みに制約がある。\n\n#### 他に検討したもの\nJSON ファイル保存。\n\n### ADR-002: 検索結果をメモリにキャッシュする\n\n#### ステータス\nAccepted\n\n#### 意思決定内容\n検索結果を最大5分メモリにキャッシュする。\n\n#### 背景\n同一クエリの応答を速くするため。\n\n#### 影響\n最大5分の遅延が生じる。\n\n#### 他に検討したもの\n毎回 SQLite を引く案。\n"
+            }
+          }
+        },
+        "main_commits_after_branch": [
+          {
+            "commit_message": "Merge parallel design PR: ADR-002 ログ形式を追加",
+            "files": {
+              "docs/architecture.md": "# アーキテクチャ\n\n## 設計判断と理由（ADR）\n\n### ADR-001: データ保存に SQLite を使う\n\n#### ステータス\nAccepted\n\n#### 意思決定内容\nローカル保存に SQLite を使う。\n\n#### 背景\n単一ファイルで運用できるため。\n\n#### 影響\n同時書き込みに制約がある。\n\n#### 他に検討したもの\nJSON ファイル保存。\n\n### ADR-002: ログを JSON Lines で出力する\n\n#### ステータス\nAccepted\n\n#### 意思決定内容\n標準出力へ JSON Lines 形式でログを出す。\n\n#### 背景\nログ基盤で集計しやすくするため。\n\n#### 影響\n人間が直接読みにくくなる。\n\n#### 他に検討したもの\nプレーンテキスト出力。\n"
+            }
+          }
+        ],
+        "checkout": "design/issue-30",
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "prs": [
+            {
+              "number": 30,
+              "title": "docs: 検索結果キャッシュの設計",
+              "state": "OPEN",
+              "isDraft": true,
+              "headRefName": "design/issue-30",
+              "body": "## 概要と関連Issue\n\nRefs #30\n\n## 変更した節\n- docs/architecture.md（ADR-002 を追加）\n",
+              "diffFiles": ["docs/architecture.md"],
+              "comments": [],
+              "reviews": []
+            }
+          ]
+        }
+      },
+      "expected": {
+        "summary": "main を取り込み、main にマージ済みの `ADR-002: ログを JSON Lines で出力する` を残し、未マージ PR 側のキャッシュ ADR だけを `ADR-003` に振り直し、PR 本文の参照も `ADR-003` に更新する。",
+        "must": [
+          "統合ブランチ `main` を取り込む（規約・指示が無いためマージで取り込む）",
+          "マージ済みの `ADR-002`（ログ形式）を消さず番号も変えない",
+          "この PR で追加したキャッシュの ADR を `ADR-003` に振り直す",
+          "PR #30 の本文にある `ADR-002` の参照も `ADR-003` に合わせる"
+        ],
+        "must_not": [
+          "マージ済みの `ADR-002` を削除または再採番する",
+          "`ADR-002` が2件重複したまま push する"
+        ],
+        "checks": {
+          "gh_must_not_call": ["^pr create"]
+        }
+      }
+    },
+    {
+      "id": "design-english-repo",
+      "title": "英語リポジトリでの新規作成（設計文書・PR本文・コメントを英語で書く）",
+      "branch": "書く言語（正本 README が英語のとき英語で書く）",
+      "prompt_args": "3",
+      "setup": {
+        "files": {
+          "README.md": "# Invoice Export Service\n\nAn English-only repository for generating PDF invoices.\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "3": {
+              "number": 3,
+              "title": "[Feature]: Export monthly invoice summary as CSV",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### Description\n\nAllow accounting staff to export monthly invoice totals as a CSV file.\n\n### Acceptance Criteria\n\n- [ ] Exports UTF-8 CSV with header row\n",
+              "comments": []
+            }
+          }
+        }
+      },
+      "expected": {
+        "summary": "正本 README が英語であるため、設計文書3ファイル・テンプレート見出し・PR本文・PRコメントをすべて英語で作成し、英語の未決印も残さない。",
+        "must": [
+          "設計文書3ファイル（`requirements.md`, `specification.md`, `architecture.md`）を英語で作成し、テンプレートの節構成・順序を保つ",
+          "PR本文（`Refs #3` を含む）と PR コメントを英語で書く",
+          "`TBD`・`Assumption`・`Unapproved`・`Tentative` などの英語の未決印を書かない"
+        ],
+        "must_not": [
+          "日本語の設計文書や日本語の見出しのまま作成する",
+          "文書内に `TBD` や `Assumption` などの未決印を残す"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 3", "^pr create"]
+        }
+      }
+    }
+  ]
+}

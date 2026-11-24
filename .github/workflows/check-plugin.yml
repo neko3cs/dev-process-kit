@@ -38,3 +38,12 @@ jobs:
         run: |
           claude plugin validate .
           claude plugin validate plugins/dev-process-kit
+
+  evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Validate evaluation scenarios and runner setup
+        run: |
+          python3 evals/validate.py
+          evals/run.sh --setup-only --all --out-dir "${RUNNER_TEMP}/dev-process-kit-evals"
