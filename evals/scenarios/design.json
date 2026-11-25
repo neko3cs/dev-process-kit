@@ -33,9 +33,9 @@
         }
       },
       "expected": {
-        "summary": "新規作成モードで `docs/` 配下に3ファイルを作成し、未決の端数処理は最も妥当な案を決まった仕様として書いて完成品にし、`Refs #5` の設計PRを作成してPRコメントで案を確認する。実装コードは書かない。",
+        "summary": "新規作成モードで `docs/` 配下に4ファイルを作成し、未決の端数処理は最も妥当な案を決まった仕様として書いて完成品にし、`Refs #5` の設計PRを作成してPRコメントで案を確認する。実装コードは書かない。",
         "must": [
-          "`docs/requirements.md`・`docs/specification.md`・`docs/architecture.md` を作成する",
+          "`docs/requirements.md`・`docs/specification.md`・`docs/architecture.md`・`docs/tests.md` を作成する",
           "テンプレートの HTML コメント（`<!-- -->`）、空の Mermaid ブロック、仮のままの ADR ひな型を残さない",
           "文書内に `TBD`・`仮定`・`未承認`・`仮案` などの未決の印を書かない",
           "`specification.md` の業務ルールに入力と期待結果の表を書く",
@@ -147,7 +147,7 @@
       "id": "design-from-existing-code-confirmation",
       "title": "既存コードから設計文書を新規作成するとき、コード読み取り箇所を追認対象として区別する",
       "branch": "手順: 新規作成モード 3〜4（既存コードの現状と仕様合意の区別）",
-      "prompt_args": "既存のコードから設計文書（requirements.md / specification.md / architecture.md）を新しく作成してください。",
+      "prompt_args": "既存のコードから設計文書（requirements.md / specification.md / architecture.md / tests.md）を新しく作成してください。",
       "setup": {
         "files": {
           "README.md": "# Rate Limiter\n\nAPI のレート制限を行う小さなモジュールです。\n",
@@ -159,9 +159,9 @@
         }
       },
       "expected": {
-        "summary": "既存コードから3ファイルを完成品として作成し、文書内に確認待ちの印を残さず、PR本文でコード読み取りに基づく節を明示し、PRコメントで「現状を仕様として追認してよいか」を確認して Draft PR を維持する。",
+        "summary": "既存コードから4ファイルを完成品として作成し、文書内に確認待ちの印を残さず、PR本文でコード読み取りに基づく節を明示し、PRコメントで「現状を仕様として追認してよいか」を確認して Draft PR を維持する。",
         "must": [
-          "3つの設計文書を完成品として作成し、`現状（コードから読み取り）` や `TBD` などの注記を文書内に残さない",
+          "4つの設計文書を完成品として作成し、`現状（コードから読み取り）` や `TBD` などの注記を文書内に残さない",
           "PR本文に、どの節が既存コードの読み取りに基づくかを明記する",
           "PRコメントで「読み取りが現状と合っているか、この現状を仕様として追認してよいか」を確認する",
           "追認待ちのため PR を Draft として作成する"
@@ -330,9 +330,9 @@
         }
       },
       "expected": {
-        "summary": "正本 README が英語であるため、設計文書3ファイル・テンプレート見出し・PR本文・PRコメントをすべて英語で作成し、英語の未決印も残さない。",
+        "summary": "正本 README が英語であるため、設計文書4ファイル・テンプレート見出し・PR本文・PRコメントをすべて英語で作成し、英語の未決印も残さない。",
         "must": [
-          "設計文書3ファイル（`requirements.md`, `specification.md`, `architecture.md`）を英語で作成し、テンプレートの節構成・順序を保つ",
+          "設計文書4ファイル（`requirements.md`, `specification.md`, `architecture.md`, `tests.md`）を英語で作成し、テンプレートの節構成・順序を保つ",
           "PR本文（`Refs #3` を含む）と PR コメントを英語で書く",
           "`TBD`・`Assumption`・`Unapproved`・`Tentative` などの英語の未決印を書かない"
         ],

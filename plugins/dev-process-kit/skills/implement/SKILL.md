@@ -1,6 +1,6 @@
 ---
 name: implement
-description: 'Implement a GitHub issue from requirements.md, specification.md, and architecture.md on one PR. Match the issue and design PR changes to the design docs, implement with test-first unit tests (TDD) plus integration and scenario tests, verify against the docs, mark ready for review, and address PR reviews. Commit, push, and create or update the PR without per-operation approval. Do not write design docs. When the external spec in the docs is missing, undecided, or wrong, stop without assuming, report what is missing, and ask the user to run /dev-process-kit:design for a separate design PR and resume after merge (or ask in chat if they do not want design docs). Decide uncovered internal design without stopping and express it in unit tests. Run only when explicitly invoked by name ("/dev-process-kit:implement 4", "$dev-process-kit:implement 4"); do not select for general requests such as "fix issue #4" or "#4を直して".'
+description: 'Implement a GitHub issue from requirements.md, specification.md, architecture.md, and tests.md on one PR. Match the issue and design PR changes to the design docs, implement with test-first unit tests (TDD) plus integration and scenario tests, verify against the docs and quality gates in tests.md, mark ready for review, and address PR reviews. Commit, push, and create or update the PR without per-operation approval. Do not write design docs. When the external spec in the docs is missing, undecided, or wrong, stop without assuming, report what is missing, and ask the user to run /dev-process-kit:design for a separate design PR and resume after merge (or ask in chat if they do not want design docs). Decide uncovered internal design without stopping and express it in unit tests. Run only when explicitly invoked by name ("/dev-process-kit:implement 4", "$dev-process-kit:implement 4"); do not select for general requests such as "fix issue #4" or "#4を直して".'
 disable-model-invocation: true
 ---
 
@@ -19,7 +19,7 @@ disable-model-invocation: true
 PR の特定方法と統合ブランチ取り込みの詳細は [PR の探索・作成・レビュー対応](references/pr-and-review.md) に従います。
 
 1. `gh issue view <番号> --comments` で Issue を読む。
-2. 設計文書の場所を、統合ブランチ上で「リポジトリの配置規約（`AGENTS.md`・README 等）→ `docs/` 配下 → リポジトリ直下」の順に探す（セッションごとに変えない）。どれも見つからなければ「設計文書が無い」とする（手順6）。ルートセットの `architecture.md`「全体構成と境界」のサービス索引や分割ディレクトリ（`specification/` 等）の索引リンクから辿れる子ファイルも設計文書に含める（索引から辿れないものは含めない）。英語など他言語の設計文書では対応する役割の節を読む。「差分が設計文書だけのPR」は変更ファイルが設計文書（または新規配置先の3ファイル）だけのPRを指す。
+2. 設計文書の場所を、統合ブランチ上で「リポジトリの配置規約（`AGENTS.md`・README 等）→ `docs/` 配下 → リポジトリ直下」の順に探す（セッションごとに変えない）。どれも見つからなければ「設計文書が無い」とする（手順6）。ルートセットの `architecture.md`「全体構成と境界」のサービス索引や分割ディレクトリ（`specification/` 等）の索引リンクから辿れる子ファイルも設計文書に含める（索引から辿れないものは含めない）。英語など他言語の設計文書では対応する役割の節を読む。「差分が設計文書だけのPR」は変更ファイルが設計文書（または新規配置先の4ファイル）だけのPRを指す。
 3. 同じ Issue の未マージの実装PRを `Closes #<番号>` の独立行で探す（差分が設計文書だけの設計PRは除外）。
    - Ready for review の実装PRがある → [Ready for review の後: 指摘に対応する](references/pr-and-review.md#3-ready-for-review-の後-指摘に対応する) に進む。
    - Draft の実装PRがある → そのブランチに切り替え、統合ブランチに設計変更がマージされていれば取り込み、手順5・6を確認して「実装する」の続きを進める（ブランチもPRも作り直さない）。作業範囲と残作業は Issue、PR本文、差分から読み、設計文書の該当箇所と照合する。
@@ -66,16 +66,16 @@ PR の特定方法と統合ブランチ取り込みの詳細は [PR の探索・
 
    部品はユニットテスト（TDD）で作り、部品がそろって機能ができたらインテグレーションテストで、業務の流れが通るようになったらシナリオテストで確かめる。
 
-   - `architecture.md` の制約はビルドの仕組みで強制できるものは強制し、できないものは PR レビューで照合する。非機能要件は `requirements.md` の目標を合否条件とする。
+   - `architecture.md` の制約はビルドの仕組みで強制できるものは強制し、できないものは PR レビューで照合する。非機能要件は `requirements.md` の目標を合否条件とする。プロジェクト固有のテストスコープ・ツール・テスト環境・品質ゲートと終了条件は `tests.md` に従う。
    - 人を含む受け入れテストは、実行と証拠集め（操作ログ、スクリーンショット、録画）を手伝えるが GO / NO-GO は人が判断するため、結果を確認済みとせず PR 本文で人の判断を待つ項目として示す。
-   - 対のテストを実行する仕組みが無い場合も黙って省かず、確かめられなかった範囲を PR 本文の未確認に書く（限界を `architecture.md` に残す必要があれば PR コメントに候補として書く）。
+   - 対のテストを実行する仕組みが無い場合も黙って省かず、確かめられなかった範囲を PR 本文の未確認に書く（限界を `tests.md` に残す必要があれば PR コメントに候補として書く）。
    - 業務ルールの表の行はテストデータにそのまま写し、設計文書の該当箇所と人が見比べられる名前・説明を付ける。
 4. **合意済みの仕様だけを実装する。** 途中で見つかった設計の問題は下の「外部仕様と内部設計」で分けて扱う。
 5. 設計文書とコードを突き合わせる。
    - 作業範囲内の食い違い → 文書を正としてコードを直す（文書の誤りなら手順4へ）。
    - 作業範囲外の食い違い → 直さない。食い違った箇所（文書の節、コードの場所）と文書の記述を一覧にして PR コメントと終わりの報告に示し、`/dev-process-kit:issue` での不具合起票を勧める（Issue は起票しない。設計PRマージ済みで別 Issue の実装待ちと確認できる箇所は不具合扱いしない）。
 6. 途中で分かった考え・暗黙知・調査結果は設計文書には書かず PR コメントに残す（設計文書に残すべきものは「設計文書に残す候補」と明記）。設計文書は Issue・PR・コードから独立させ、未実装メモを残さない。
-7. 品質ゲートを通す（規約・`architecture.md`「検証方針と重点リスク」・指示で決まる検証。元々の失敗は無視してよいが新たな失敗は直す）。定めが無い場合は、リポジトリに既存の仕組みがありローカル実行できるテスト・ビルド・型チェック・リンターをすべて通し、仕組みが無いものは新規導入せず未確認として扱う（品質ゲート設定の提案が必要なら PR コメントに候補として書く）。
+7. 品質ゲートを通し、終了条件を満たすまで進める（`tests.md`・規約・指示に従う。定めが無い場合の扱い・ガードレール・結果の分類は [品質ゲート](references/quality-gate.md)）。
 8. コミット・push し、実装PRを作成・更新する（詳細・必須項目・`Closes #<番号>` は [PR の探索・作成・レビュー対応](references/pr-and-review.md#2-実装pr-の作成更新とコミット)）。
 9. 品質ゲート・PR 本文・自動チェック指摘への対応まで終えて push してから `gh pr ready <PR番号>` で Ready for review にする（マージはユーザーの判断）。
 
@@ -111,3 +111,4 @@ PR の特定方法と統合ブランチ取り込みの詳細は [PR の探索・
 
 - [PR の探索・作成・レビュー対応](references/pr-and-review.md) — PR 特定・PR 本文必須項目・Ready 後の指摘対応・ブランチ取り込み・コメント書き換え
 - [ユニットテスト](references/unit-test.md) / [インテグレーションテスト](references/integration-test.md) / [シナリオテスト](references/scenario-test.md)
+- [品質ゲート](references/quality-gate.md) — `tests.md` に沿った品質ゲートの進め方、検証ガードレール、結果の分類と報告

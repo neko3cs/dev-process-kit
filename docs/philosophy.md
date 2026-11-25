@@ -22,7 +22,7 @@ The phases move in one direction, from upstream to downstream.
 | Phase | Deliverables | Skill | Boundary |
 | :--- | :--- | :--- | :--- |
 | Requirements definition | Issue, requirements document (`requirements.md`) | `dev-process-kit:issue`, `dev-process-kit:design` | — |
-| Design | Specification (`specification.md`), architecture document (`architecture.md`) | `dev-process-kit:design` | Merging the design PR freezes the specification |
+| Design | Specification (`specification.md`), architecture document (`architecture.md`), test plan (`tests.md`) | `dev-process-kit:design` | Merging the design PR freezes the specification |
 | Implementation and testing | Product code, test code | `dev-process-kit:implement` | — |
 | Acceptance testing | GO / NO-GO decision | — (done by a person) | Merging the implementation PR completes the Issue |
 
@@ -30,21 +30,22 @@ The phases move in one direction, from upstream to downstream.
 
 Development starts from an Issue. Every request is filed and tracked as an Issue. When what to build is recorded in an Issue, people and AI without the conversation history can later pick up from the same place.
 
-An Issue holds only the request. Even parts of the request that are not settled yet are written as a finished request, with the most reasonable content, and are asked about in Issue comments so that work moves on. The agreement on what to build and the acceptance criteria go into the requirements document (`requirements.md`). The requirements document is written in the same design PR as the specification and the architecture document, and all three are agreed together when that PR is merged.
+An Issue holds only the request. Even parts of the request that are not settled yet are written as a finished request, with the most reasonable content, and are asked about in Issue comments so that work moves on. The agreement on what to build and the acceptance criteria go into the requirements document (`requirements.md`). The requirements document is written in the same design PR as the specification, the architecture document, and the test plan, and all four are agreed together when that PR is merged.
 
 ### Design defines the specification the requirements call for
 
-Design starts once the requirements are settled. It defines how the system or app should behave to meet the requirements, and records this in three documents.
+Design starts once the requirements are settled. It defines how the system or app should behave to meet the requirements, and records this in four documents.
 
 | Document | Question it answers |
 | :--- | :--- |
 | Requirements document (`requirements.md`) | Why, for whom, and what to achieve |
 | Specification (`specification.md`) | What should happen under which conditions |
 | Architecture document (`architecture.md`) | Which structure and constraints realize it, and why |
+| Test plan (`tests.md`) | What to verify, how far, in which environment, and by which criteria |
 
 Design documents are not a copy of the current code. They record the commitments people made and the reasons behind those decisions. The AI writes them as finished work, not as drafts full of assumptions. Where something is undecided, it picks the most reasonable option, writes it as the specification, and asks people in design PR comments whether that choice is right.
 
-By default the three documents live in one place. A monorepo can keep a set of the three per service, with a set for the whole repository whose `architecture.md` indexes the others. A document that grows too large to update one section at a time can be split by feature into a directory of the same name, leaving the original file as the index. Either split is made in a design PR that changes only the structure, not the specification.
+By default the four documents live in one place. A monorepo can keep a set of the four per service, with a set for the whole repository whose `architecture.md` indexes the others. A document that grows too large to update one section at a time can be split by feature into a directory of the same name, leaving the original file as the index. Either split is made in a design PR that changes only the structure, not the specification.
 
 ### Merging the design PR freezes the specification
 
@@ -111,7 +112,7 @@ This plugin decides the flow of the phases and the rules that keep the flow inta
 | Decided by this plugin | Left to the repository's conventions and the user's instructions |
 | :--- | :--- |
 | Requests are filed as Issues | How Issue templates are structured |
-| Design is recorded in three design documents | Where the design documents live (existing conventions win) |
+| Design is recorded in four design documents | Where the design documents live (existing conventions win) |
 | Merging the design PR freezes the specification | PR format and templates |
 | One implementation PR per Issue | Branch names, how branches are created, and how the integration branch is incorporated |
 | The PR stays in Draft while a decision is pending | Coding conventions |

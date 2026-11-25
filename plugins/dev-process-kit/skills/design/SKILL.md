@@ -1,24 +1,25 @@
 ---
 name: design
-description: 'Create and maintain three design documents (requirements.md, specification.md, architecture.md) for the dev-process-kit process, including designing a GitHub issue into acceptance criteria and business rules, addressing design PR reviews, and reflecting specification changes. Keep docs self-contained and authoritative; report mismatches as code defects unless a specification change is requested. Write docs as finished deliverables: settle undecided design on the best option without assumption or unapproved markers, and ask concrete questions about those choices in PR comments. Commit, push, and create or update a PR without per-operation approval. Do not implement code. Run only when the user explicitly invokes this skill by name ("/dev-process-kit:design 4", "$dev-process-kit:design 4"); do not select it for general requests such as "design issue #4" or "ドキュメントを整備して".'
+description: 'Create and maintain four design documents (requirements.md, specification.md, architecture.md, tests.md) for the dev-process-kit process, including designing a GitHub issue into acceptance criteria, business rules, and test plans, addressing design PR reviews, and reflecting specification changes. Keep docs self-contained and authoritative; report mismatches as code defects unless a specification change is requested. Write docs as finished deliverables: settle undecided design on the best option without assumption or unapproved markers, and ask concrete questions about those choices in PR comments. Commit, push, and create or update a PR without per-operation approval. Do not implement code. Run only when the user explicitly invokes this skill by name ("/dev-process-kit:design 4", "$dev-process-kit:design 4"); do not select it for general requests such as "design issue #4" or "ドキュメントを整備して".'
 disable-model-invocation: true
 ---
 
 # design Skill
 
-`requirements.md` / `specification.md` / `architecture.md` の3ファイルを作成・更新します。
+`requirements.md` / `specification.md` / `architecture.md` / `tests.md` の4ファイルを作成・更新します。
 
 | ファイル | 答える問い | 残す情報 |
 | :--- | :--- | :--- |
 | `requirements.md` | なぜ、誰のために、何を達成するか | 目的、利用者、利用シナリオ、業務要件、機能要件と受け入れ基準、非機能目標、対象外、用語 |
 | `specification.md` | どの条件で、何が起きるべきか | 業務ルール、画面操作、状態、データの意味と制約、入出力形式、互換性、エラー・通知 |
-| `architecture.md` | どの構造・制約で実現するか、なぜか | 構成と依存、設計判断、永続化・整合性・移行、共通実装規約、非機能の実現方式、検証方針と重点リスク |
+| `architecture.md` | どの構造・制約で実現するか、なぜか | 構成と依存、設計判断、永続化・整合性・移行、共通実装規約、非機能の実現方式 |
+| `tests.md` | 何をどこまで、どの環境・基準で検証するか | テストスコープ、テストレベルと使用ツール、テスト環境と外部境界、品質ゲートと基準、終了条件、重点リスクと検証限界 |
 
 記載基準・切り分け・テストと図・分割方針は [方針の抜粋](references/policy.md) を、各節の構成は [テンプレート](assets/templates/) を参照します。各文書は [設計文書と検証の対応](references/policy.md#設計文書と検証の対応) で確かめられるように書きます。
 
 ## 責務と原則
 
-- **責務の境界**: 設計文書3ファイルの作成・更新と設計PRの作成・更新だけを行う（テスト・プロダクトコードの実装や Issue への書き込み・起票・編集・クローズはしない）。文書とコードが食い違ったら文書を正としてコードの不具合を報告する（利用者が確認するのは文書のため）。
+- **責務の境界**: 設計文書4ファイルの作成・更新と設計PRの作成・更新だけを行う（テスト・プロダクトコードの実装や Issue への書き込み・起票・編集・クローズはしない）。文書とコードが食い違ったら文書を正としてコードの不具合を報告する（利用者が確認するのは文書のため）。
 - **読者向けの完成品として書く**: 設計PRのマージで文書に書いた内容がすべて合意・凍結されるため、そのままマージできる状態で書く。
   - Issue の本文・コメントで決まった内容を引き継ぐ（Issue コメントで未回答の内容は合意済みと扱わず設計で決める）。
   - 未決の設計は会話・既存仕様・コード・一般的な利用例から最も妥当な案を選び、表の期待結果も含めて決まった仕様として書く。未決の印やテンプレートの案内・未使用要素は残さない（例: `TBD`・`仮定`・`未承認`・`Assumption`・`現状（コードから読み取り）`・`<!-- -->`・空見出し・空 Mermaid・仮 ADR・回答経緯の注記）。選んだ案の確認や既存コード読み取りの追認は PR コメントで行う。
@@ -48,12 +49,12 @@ Issue 番号を渡されたら、`gh issue view <番号> --comments` で本文�
 
 ## モード判定と手順
 
-まず対象の設計文書を特定します。サービスごとのセットやファイル分割があれば（[設計文書の分割](references/policy.md#7-設計文書の分割)）、ルートセットの `architecture.md`「全体構成と境界」や索引から対象だけを選びます。対象ディレクトリの3ファイルの有無でモードを決めます（0件 → 新規作成、1件以上 → 更新で既存は上書きしない、一部のみ → 無いものだけ新規作成）。
+まず対象の設計文書を特定します。サービスごとのセットやファイル分割があれば（[設計文書の分割](references/policy.md#7-設計文書の分割)）、ルートセットの `architecture.md`「全体構成と境界」や索引から対象だけを選びます。対象ディレクトリの4ファイルの有無でモードを決めます（0件 → 新規作成、1件以上 → 更新で既存は上書きしない、一部のみ → 無いものだけ新規作成）。
 
 ### 新規作成モード
 
 1. 配置先を確認する（既存の配置規約 → 既存の `docs/` 配下 → リポジトリ直下。判断理由は PR 本文に記載）。monorepo の新サービスはルートセットの索引にも足す。
-2. `assets/templates/` の3ファイルを配置先へコピーし、必要なら訳す。
+2. `assets/templates/` の4ファイルを配置先へコピーし、必要なら訳す。
 3. リポジトリの内容（README、コード、`AGENTS.md`、Issue、説明）から確認できた事実と、未決箇所で選んだ案を、どちらも決まった設計として各節に書く。
 4. 既存コードから読み取った現状の動作がある場合は、まだ仕様として合意されていないため、該当する節を PR 本文にまとめ、PR コメントで「読み取りが現状と合っているか、この現状を仕様として追認してよいか」を選んだ案の質問と分けて確認し、追認待ちのあいだ PR を Draft に維持する（詳細: [方針の抜粋](references/policy.md#4-情報の性質による切り分け)）。
 5. 完成品として不要な要素を整理する。案件に無い節は省略する（外部通信がなくてもファイル入出力は「入出力・外部連携仕様」に書き、対象が無いこと自体が制約なら理由を残す）。HTML コメント、空の Mermaid ブロック、記録する決定が無い ADR ひな型（0件なら節も省略）、空見出しはすべて削除する。
@@ -76,10 +77,11 @@ Issue 番号を渡されたら、`gh issue view <番号> --comments` で本文�
 | :--- | :--- |
 | 目的、利用者、利用シナリオ、業務要件、機能要件、受け入れ基準、非機能目標、スコープ、用語 | `requirements.md` |
 | 入力と結果、計算・検証規則、画面と操作可否、実際の状態遷移、データの意味・関連・制約、入出力形式、互換性、エラー・通知 | `specification.md` |
-| 全体構成と境界、不変条件、責務と依存、技術選定、設計理由（ADR）、永続化・整合性・移行、共通実装規約、非機能の実現方式、検証方針・重点リスク・検証限界 | `architecture.md` |
+| 全体構成と境界、不変条件、責務と依存、技術選定、設計理由（ADR）、永続化・整合性・移行、共通実装規約、非機能の実現方式 | `architecture.md` |
+| テストスコープ、テストレベルと使用ツール、テスト環境と外部境界、品質ゲートと基準、終了条件、重点リスクと検証限界 | `tests.md` |
 | 現在のクラス・関数一覧、内部呼び出し順序、詳細なデータアクセス手順 | 保守対象外（必要時に現在のコードから説明） |
 
-迷ったら**達成目標・期待動作・実現方式のどれか**で分けます（境界例: [情報の性質による切り分け](references/policy.md#4-情報の性質による切り分け)）。ADR は追記で履歴を残し、決定変更は新番号を追加して相互参照します（書式・Status・例外: [ADR の記録と改定](references/policy.md#adr-の記録と改定)）。
+迷ったら**達成目標・期待動作・実現方式・検証計画のどれか**で分けます（境界例: [情報の性質による切り分け](references/policy.md#4-情報の性質による切り分け)）。ADR は追記で履歴を残し、決定変更は新番号を追加して相互参照します（書式・Status・例外: [ADR の記録と改定](references/policy.md#adr-の記録と改定)）。
 
 ## PRで確認する
 
@@ -92,4 +94,4 @@ Issue 番号を渡されたら、`gh issue view <番号> --comments` で本文�
 
 - [方針の抜粋](references/policy.md) — 記載基準・切り分け・ADR・テスト対応・図・分割
 - [PR 作成と統合ブランチ取り込み](references/pr-and-sync.md) — PR テンプレート・本文必須項目・質問コメント・衝突と ADR 重複の解消
-- [テンプレート](assets/templates/) — `requirements.md` / `specification.md` / `architecture.md`
+- [テンプレート](assets/templates/) — `requirements.md` / `specification.md` / `architecture.md` / `tests.md`

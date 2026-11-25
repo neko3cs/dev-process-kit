@@ -7,7 +7,7 @@ dev-process-kit の3つのスキルが、何を読み、何を作り、何をし
 | スキル | 工程 | 読むもの | 作るもの |
 | :--- | :--- | :--- | :--- |
 | [`dev-process-kit:issue`](#dev-process-kitissue) | 起票 | 利用者の要望、Issue テンプレート | GitHub Issue、Issue コメント |
-| [`dev-process-kit:design`](#dev-process-kitdesign) | 設計 | Issue、既存の設計文書、コード | 3つの設計文書、設計 PR、質問コメント |
+| [`dev-process-kit:design`](#dev-process-kitdesign) | 設計 | Issue、既存の設計文書、コード | 4つの設計文書、設計 PR、質問コメント |
 | [`dev-process-kit:implement`](#dev-process-kitimplement) | 実装 | Issue、マージ済みの設計文書と設計 PR | プロダクトコード、テストコード、実装 PR |
 
 どのスキルも、PR の書式・ブランチ名・テストフレームワーク・品質ゲートの方法は決めません。リポジトリの規約、テンプレート、利用者の指示に従います。
@@ -47,7 +47,7 @@ dev-process-kit の3つのスキルが、何を読み、何を作り、何をし
 
 ## `dev-process-kit:design`
 
-Issue を3つの設計文書に設計し、設計 PR を作ります。正本: [`skills/design/SKILL.md`](../plugins/dev-process-kit/skills/design/SKILL.md)、判断基準: [`references/policy.md`](../plugins/dev-process-kit/skills/design/references/policy.md)、PR 作成とブランチ取り込み: [`references/pr-and-sync.md`](../plugins/dev-process-kit/skills/design/references/pr-and-sync.md)
+Issue を4つの設計文書に設計し、設計 PR を作ります。正本: [`skills/design/SKILL.md`](../plugins/dev-process-kit/skills/design/SKILL.md)、判断基準: [`references/policy.md`](../plugins/dev-process-kit/skills/design/references/policy.md)、PR 作成とブランチ取り込み: [`references/pr-and-sync.md`](../plugins/dev-process-kit/skills/design/references/pr-and-sync.md)
 
 ### 使う場面
 
@@ -63,14 +63,15 @@ Issue を3つの設計文書に設計し、設計 PR を作ります。正本: [
 | :--- | :--- | :--- |
 | `requirements.md` | なぜ、誰のために、何を達成するか | 目的、利用者、利用シナリオ、業務要件、機能要件と受け入れ基準、非機能目標、対象外、用語 |
 | `specification.md` | どの条件で、何が起きるべきか | 業務ルール（入力と期待結果の表）、画面操作、状態、データの意味と制約、入出力形式、エラー・通知 |
-| `architecture.md` | どの構造・制約で実現するか、なぜか | 構成と依存、設計判断（ADR）、永続化・移行、共通実装規約、非機能の実現方式、検証方針と重点リスク |
+| `architecture.md` | どの構造・制約で実現するか、なぜか | 構成と依存、設計判断（ADR）、永続化・移行、共通実装規約、非機能の実現方式 |
+| `tests.md` | 何をどこまで、どの環境・基準で検証するか | テストスコープ、テストレベルと使用ツール、テスト環境と外部境界、品質ゲートと基準、終了条件、重点リスクと検証限界 |
 
 文書の置き場所は、既存の規約を優先します。指定がなければ既存の `docs/` の中、無ければリポジトリ直下に置きます。
 
 ### 動き
 
-- 3つの文書が1つも無ければテンプレートから新しく作り、あれば該当する節だけを差分で更新します。既存の文書を丸ごと書き直すことはしません。
-- monorepo では、サービスごとに3文書の組を置けます。各組は、リポジトリ全体の組の `architecture.md` にある索引から探します。節ごとに更新できないほど大きくなった文書は、同じ名前のディレクトリに機能ごとに分け、元のファイルを索引として残せます。どちらの分け方も、構成だけを変える別の設計 PR で提案して行います。
+- 4つの文書が1つも無ければテンプレートから新しく作り、あれば該当する節だけを差分で更新します。既存の文書を丸ごと書き直すことはしません。
+- monorepo では、サービスごとに4文書の組を置けます。各組は、リポジトリ全体の組の `architecture.md` にある索引から探します。節ごとに更新できないほど大きくなった文書は、同じ名前のディレクトリに機能ごとに分け、元のファイルを索引として残せます。どちらの分け方も、構成だけを変える別の設計 PR で提案して行います。
 - Issue が、それぞれ単独で価値を届けられる要件を複数含んでいれば、設計を始めずに止まります。分け方を示し、`/dev-process-kit:issue` で要件ごとに起票し直すよう頼みます。Issue の起票・編集・クローズは自分では行いません。
 - 設計文書は完成品として書きます。決まっていない設計は最も妥当な案を選び、`仮定`・`未承認`・`TBD` などの印を付けずに、理由とともに仕様として書きます。選んだ案でよいかは設計 PR のコメントで質問し、回答は該当箇所の書き換えで反映します。
 - 既存のコードから設計文書を新しく作るときも、文書には確認待ちの印を付けません。コードから読み取った現状の動作は、PR 本文と PR コメントで新しく選んだ案と区別して示し、仕様として追認するかを質問します。追認前の記述とコードの食い違いは、コードの不具合ではなく確認事項として扱います。設計 PR のマージ後に差異が見つかった場合は、Issue で報告してどちらに決めるかの判断を利用者に委ねます。
@@ -89,7 +90,7 @@ Issue を3つの設計文書に設計し、設計 PR を作ります。正本: [
 
 ## `dev-process-kit:implement`
 
-マージ済みの設計文書をもとに、Issue 1つにつき1つの実装 PR で実装します。正本: [`skills/implement/SKILL.md`](../plugins/dev-process-kit/skills/implement/SKILL.md)、PR とレビュー対応: [`references/pr-and-review.md`](../plugins/dev-process-kit/skills/implement/references/pr-and-review.md)、テストの定義: [`unit-test.md`](../plugins/dev-process-kit/skills/implement/references/unit-test.md)・[`integration-test.md`](../plugins/dev-process-kit/skills/implement/references/integration-test.md)・[`scenario-test.md`](../plugins/dev-process-kit/skills/implement/references/scenario-test.md)
+マージ済みの設計文書をもとに、Issue 1つにつき1つの実装 PR で実装します。正本: [`skills/implement/SKILL.md`](../plugins/dev-process-kit/skills/implement/SKILL.md)、PR とレビュー対応: [`references/pr-and-review.md`](../plugins/dev-process-kit/skills/implement/references/pr-and-review.md)、テストの定義: [`unit-test.md`](../plugins/dev-process-kit/skills/implement/references/unit-test.md)・[`integration-test.md`](../plugins/dev-process-kit/skills/implement/references/integration-test.md)・[`scenario-test.md`](../plugins/dev-process-kit/skills/implement/references/scenario-test.md)、品質ゲートと検証ガードレール: [`quality-gate.md`](../plugins/dev-process-kit/skills/implement/references/quality-gate.md)
 
 ### 使う場面
 
@@ -114,7 +115,7 @@ Issue を3つの設計文書に設計し、設計 PR を作ります。正本: [
 
   `architecture.md` の制約は、ビルドの仕組みで強制するか、PR のレビューで照合します。
 - 部品はユニットテストを先に書くテスト駆動開発（TDD）で作り、TODO リストの1項目ずつ Red → Green → Refactor を回します。
-- 機能ができたらインテグレーションテストを書きます。仕様書から入力と期待結果を決め、システムの境界の内側ではテストダブルを使わずに結合して確かめます。境界の外は提供元のテスト環境を使い、テスト環境が無い場合はテストダブルで代替して未確認に書きます。テスト環境はあるが作業環境にその資格情報が無い場合は、テストダブルで代替して検証できる範囲を進め、確かめられなかった範囲と理由を PR 本文の未確認に書きます。外部サービスと接続したテストの要否は利用者が判断するため、`architecture.md` や利用者の指示で方針が決まっていなければ PR コメントで要否を確認して Draft を維持し、方針が決まっていれば判断待ちにせず進めます。資格情報がある環境（CI のシークレットなど）でだけ実行する方針や検証の限界を残す必要があれば、PR コメントで `architecture.md` への追記を提案します。
+- 機能ができたらインテグレーションテストを書きます。仕様書から入力と期待結果を決め、システムの境界の内側ではテストダブルを使わずに結合して確かめます。境界の外は提供元のテスト環境を使い、テスト環境が無い場合はテストダブルで代替して未確認に書きます。テスト環境はあるが作業環境にその資格情報が無い場合は、テストダブルで代替して検証できる範囲を進め、確かめられなかった範囲と理由を PR 本文の未確認に書きます。外部サービスと接続したテストの要否は利用者が判断するため、`tests.md` や利用者の指示で方針が決まっていなければ PR コメントで要否を確認して Draft を維持し、方針が決まっていれば判断待ちにせず進めます。資格情報がある環境（CI のシークレットなど）でだけ実行する方針や検証の限界を残す必要があれば、PR コメントで `tests.md` への追記を提案します。
 - 業務の流れが通るようになったらシナリオテストを書きます。業務要件の業務の手順をそのままテストの手順にし、GUI なら UI テスト、バッチならテスト用のスクリプトで確かめます。
 - カバレッジはユニットテストとインテグレーションテストで測り、シナリオテストは含めません。
 - テストは設計文書と同じ言葉で、仕様の文脈ごとにまとめ、期待結果まで含む名前を付けて、仕様として読めるように書きます。
@@ -127,7 +128,7 @@ Issue を3つの設計文書に設計し、設計 PR を作ります。正本: [
 - 実装 PR の本文には、作成時から `Closes #<番号>` だけの行を書きます。同じ Issue の設計 PR・実装 PR は、全文検索だけに頼らずこれらの行で探すため、番号に触れただけの PR を拾いません。受け入れ基準ごとの対応するテスト、確認済みと未確認の動作確認も書きます。
 - 設計文書はどの言語で書かれていても読み、節は見出しの言葉ではなく役割で探します。決まっていない・承認されていないことを示す語や注記は、言語に関わらず未決の印として扱い（`仮定`・`TBD`・`Assumption`・`Unapproved` など）、実装を始めずに止まります。PR 本文とコメントは、リポジトリの規約や利用者の指示で決まる言語で書き、決まっていなければ設計文書と同じ言語で書きます。
 - サービスごとの組や分割された文書があれば、索引をたどり、対象のサービスの組と、関係する子ファイルだけを読みます。
-- 人の判断を待つ事項があれば Draft のままにし、PR コメントで質問します。品質ゲートと自動チェックへの対応を終えてから Ready for review にします。規約にも指示にも品質ゲートが定められていない場合は、既存のテスト・ビルド・型チェック・リンターのうちローカルで実行できるものを通し、実行したものと実行しなかったものを PR 本文の動作確認に分けて書き、必要なら `architecture.md` に品質ゲートを定めることを PR コメントで提案します。
+- 人の判断を待つ事項があれば Draft のままにし、PR コメントで質問します。`tests.md`・規約・指示で定めた品質ゲートと自動チェックへの対応を終えてから Ready for review にします。品質ゲートの実行では `references/quality-gate.md` のガードレールに従い、未実行や空の解析結果を合格にせず、基準の緩和や終了コードの隠蔽を避け、結果を確認済み・失敗/基準未達・対象外・未確認に分けて報告します。品質ゲートが定められていない場合は、既存のテスト・ビルド・型チェック・リンターのうちローカルで実行できるものを通し、実行したものと実行しなかったものを PR 本文の動作確認に分けて書き、必要なら `tests.md` に品質ゲートを定めることを PR コメントで提案します。
 - Ready for review の後のレビュー対応は、ひとまとまりの対応ごとに1回だけ push します。
 - 統合ブランチを実装ブランチに取り込む方法（マージか rebase か）は、リポジトリの規約や利用者の指示に従い、指定が無ければマージにします。rebase 後の push には `--force-with-lease` を使い、Ready for review の後の rebase と force push は規約や指示で求められない限り避けます。
 
