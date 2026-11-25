@@ -2,7 +2,7 @@
 
 English | [日本語](skills.ja.md)
 
-This page summarizes what the three dev-process-kit skills read, produce, and do not do. Each skill's `SKILL.md` is the authoritative source for the detailed steps and decision criteria. The skill files are written in Japanese, but the Issues, design documents, and PRs they produce follow the language of the target repository.
+This page summarizes what the three dev-process-kit skills read, produce, and do not do. Each skill's `SKILL.md` and its `references/` files are the authoritative source for the detailed steps and decision criteria. The skill files are written in Japanese, but the Issues, design documents, and PRs they produce follow the language of the target repository.
 
 | Skill | Phase | Reads | Produces |
 | :--- | :--- | :--- | :--- |
@@ -14,7 +14,7 @@ None of the skills decide PR format, branch names, test frameworks, or how to ru
 
 ## `dev-process-kit:issue`
 
-Files a request as a GitHub Issue. Source: [`skills/issue/SKILL.md`](../plugins/dev-process-kit/skills/issue/SKILL.md)
+Files a request as a GitHub Issue. Source: [`skills/issue/SKILL.md`](../plugins/dev-process-kit/skills/issue/SKILL.md); templates and `gh` operations: [`references/templates-and-gh.md`](../plugins/dev-process-kit/skills/issue/references/templates-and-gh.md)
 
 ### When to use
 
@@ -29,13 +29,13 @@ It runs only when called by name. A general request such as "create an issue" do
 
 ### What it does
 
-- Re-reads the target repository's `.github/ISSUE_TEMPLATE/` every time it files an Issue. If there is none, it uses the templates in the owner's `.github` repository. If neither exists, it writes the body under three headings: a description, the motivation and background, and the acceptance criteria. `config.yml` is the chooser's configuration, not a template, so it is never picked. When a template exists, the Issue always follows one, whatever `blank_issues_enabled` says.
+- Re-reads the target repository's `.github/ISSUE_TEMPLATE/` every time it files an Issue. If there is none, it uses the templates in the owner's `.github` repository. If neither exists, it writes the body under three headings: a description, the motivation and background, and the acceptance criteria. `config.yml` / `config.yaml` is the chooser's configuration, not a template, so it is never picked. When a template exists, the Issue always follows one, whatever `blank_issues_enabled` says.
 - Leaves `type: markdown` elements of Issue Forms out of the body, as GitHub does on submission, and sets the template's `assignees`, `projects`, and `type` as well as its title prefix and labels. A template label that the target repository lacks is left off rather than created, the Issue is still filed, and the skill tells the user which labels it could not add.
 - Always fills in required fields. The body is written as a finished request: for an undecided part, the skill picks the most reasonable content and writes it as the request, without markers such as `仮定` (assumption) or `TBD`. It does not stop filing to ask; instead, it asks in an Issue comment whether that content is right.
 - Files one Issue per requirement. If the request holds several requirements that each deliver value on their own, it shows how it would split them (a title and requirement per Issue) and asks before filing them as separate Issues. It does not use parent and child Issues; each Issue gets a comment naming the others filed with it.
 - Checks a checkbox that can be verified from the content (such as "contains no confidential information") only after reviewing the body. It never checks a box that stands for your own agreement or confirmation (agreeing to a code of conduct, having searched for duplicates, and so on) on your behalf: unless you already said so in the conversation, it quotes the item and asks you before filing. Without your agreement the box stays unchecked, and a required one stops the filing.
 - Writes only the request and facts about the repository (code behavior, external specifications, investigation results, rejected options and their technical reasons) in the body and comments. Your own circumstances heard in the conversation (clients or company names, other projects, internal schedules, personal matters) are left out, or generalized when the motivation needs them, unless you explicitly ask for them to be written. Everyone who can read the repository sees an Issue, and notifications go out when it is filed, so deleting it later does not undo that.
-- Stops before filing only to split several requirements or to ask about consent checkboxes, and asks about both in one question.
+- Stops before filing only to split several requirements, to ask about consent checkboxes, or when it is hard to choose among multiple templates, and asks about all applicable points in one question.
 - Writes in the language set by the repository's rules or your instructions; failing that, the template's language, then the language of the repository's main documents (the source version, not a translation), then the language of the conversation. Template headings, title prefixes, and labels are used as they are, without translation.
 - Does not invent facts such as reproduction results, environments, or measurements; it marks them as unconfirmed.
 - Puts the request in the body and moves long investigation results and history into comments. A comment on the same topic is rewritten rather than followed by a new one, but only a comment the agent itself wrote: comments by other people, or ones you wrote yourself from the same account, are never edited; when they go out of date, a new comment adds the update.
@@ -47,7 +47,7 @@ It runs only when called by name. A general request such as "create an issue" do
 
 ## `dev-process-kit:design`
 
-Designs an Issue into three design documents and opens a design PR. Source: [`skills/design/SKILL.md`](../plugins/dev-process-kit/skills/design/SKILL.md); decision criteria: [`references/policy.md`](../plugins/dev-process-kit/skills/design/references/policy.md)
+Designs an Issue into three design documents and opens a design PR. Source: [`skills/design/SKILL.md`](../plugins/dev-process-kit/skills/design/SKILL.md); decision criteria: [`references/policy.md`](../plugins/dev-process-kit/skills/design/references/policy.md); PR and branch syncing: [`references/pr-and-sync.md`](../plugins/dev-process-kit/skills/design/references/pr-and-sync.md)
 
 ### When to use
 
@@ -89,7 +89,7 @@ Existing conventions decide where the documents live. Without one, they go under
 
 ## `dev-process-kit:implement`
 
-Implements from the merged design documents, with one implementation PR per Issue. Source: [`skills/implement/SKILL.md`](../plugins/dev-process-kit/skills/implement/SKILL.md); test definitions: [`unit-test.md`](../plugins/dev-process-kit/skills/implement/references/unit-test.md), [`integration-test.md`](../plugins/dev-process-kit/skills/implement/references/integration-test.md), [`scenario-test.md`](../plugins/dev-process-kit/skills/implement/references/scenario-test.md)
+Implements from the merged design documents, with one implementation PR per Issue. Source: [`skills/implement/SKILL.md`](../plugins/dev-process-kit/skills/implement/SKILL.md); PR and review handling: [`references/pr-and-review.md`](../plugins/dev-process-kit/skills/implement/references/pr-and-review.md); test definitions: [`unit-test.md`](../plugins/dev-process-kit/skills/implement/references/unit-test.md), [`integration-test.md`](../plugins/dev-process-kit/skills/implement/references/integration-test.md), [`scenario-test.md`](../plugins/dev-process-kit/skills/implement/references/scenario-test.md)
 
 ### When to use
 

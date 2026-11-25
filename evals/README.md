@@ -1,6 +1,6 @@
 # Skill Regression Evaluations (`evals/`)
 
-This directory contains regression evaluation scenarios for `dev-process-kit:issue`, `dev-process-kit:design`, and `dev-process-kit:implement`. Each scenario tests a key decision branch in `SKILL.md` so that edits to skill instructions do not silently break stop conditions, PR conventions, or workflow rules.
+This directory contains regression evaluation scenarios for `dev-process-kit:issue`, `dev-process-kit:design`, and `dev-process-kit:implement`. Each scenario tests a key decision branch in `SKILL.md` and `references/` so that edits to skill instructions do not silently break stop conditions, PR conventions, or workflow rules.
 
 ## Structure
 
