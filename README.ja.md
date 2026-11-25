@@ -15,7 +15,7 @@ AI コーディングエージェント向けの開発プロセス系スキル�
 | スキル | 役割 |
 | :--- | :--- |
 | `issue` | 要望を GitHub Issue に起票する。リポジトリの Issue テンプレートがあれば従う |
-| `design` | Issue を `requirements.md`・`specification.md`・`architecture.md` の3文書に設計し、設計 PR を作る |
+| `design` | Issue を `requirements.md`・`specification.md`・`architecture.md`・`tests.md` の4文書に設計し、設計 PR を作る |
 | `implement` | マージ済みの設計文書をもとに、Issue 1つにつき1つの実装 PR で実装する |
 
 どの設計文書をどのレベルの検証で確かめるかという対応と、ユニットテスト・インテグレーションテスト・シナリオテストそれぞれの定義（ユニットテストを実装より先に書くテスト駆動開発（TDD）を含む）は、このプラグインが決めます。PR の書式、テストフレームワークやツール、品質ゲートの方法は決めません。リポジトリの規約と利用者の指示に従います。詳しくは [dev-process-kit の思想](docs/philosophy.ja.md) を参照してください。

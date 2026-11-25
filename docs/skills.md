@@ -7,7 +7,7 @@ This page summarizes what the three dev-process-kit skills read, produce, and do
 | Skill | Phase | Reads | Produces |
 | :--- | :--- | :--- | :--- |
 | [`dev-process-kit:issue`](#dev-process-kitissue) | File | The user's request, Issue templates | GitHub Issue, Issue comments |
-| [`dev-process-kit:design`](#dev-process-kitdesign) | Design | Issue, existing design documents, code | Three design documents, design PR, question comments |
+| [`dev-process-kit:design`](#dev-process-kitdesign) | Design | Issue, existing design documents, code | Four design documents, design PR, question comments |
 | [`dev-process-kit:implement`](#dev-process-kitimplement) | Implementation | Issue, merged design documents and design PRs | Product code, test code, implementation PR |
 
 None of the skills decide PR format, branch names, test frameworks, or how to run quality gates. They follow the repository's conventions and templates and the user's instructions.
@@ -47,7 +47,7 @@ It runs only when called by name. A general request such as "create an issue" do
 
 ## `dev-process-kit:design`
 
-Designs an Issue into three design documents and opens a design PR. Source: [`skills/design/SKILL.md`](../plugins/dev-process-kit/skills/design/SKILL.md); decision criteria: [`references/policy.md`](../plugins/dev-process-kit/skills/design/references/policy.md); PR and branch syncing: [`references/pr-and-sync.md`](../plugins/dev-process-kit/skills/design/references/pr-and-sync.md)
+Designs an Issue into four design documents and opens a design PR. Source: [`skills/design/SKILL.md`](../plugins/dev-process-kit/skills/design/SKILL.md); decision criteria: [`references/policy.md`](../plugins/dev-process-kit/skills/design/references/policy.md); PR and branch syncing: [`references/pr-and-sync.md`](../plugins/dev-process-kit/skills/design/references/pr-and-sync.md)
 
 ### When to use
 
@@ -63,14 +63,15 @@ It runs only when called by name. A general request such as "design #12" or "wri
 | :--- | :--- | :--- |
 | `requirements.md` | Why, for whom, and what to achieve | Purpose, users, usage scenarios, business requirements, functional requirements and acceptance criteria, non-functional targets, out of scope, glossary |
 | `specification.md` | What should happen under which conditions | Business rules (tables of inputs and expected results), screen operations, states, meaning and constraints of data, input/output formats, errors and notifications |
-| `architecture.md` | Which structure and constraints realize it, and why | Structure and dependencies, design decisions (ADRs), persistence and migration, shared implementation conventions, how non-functional targets are met, verification policy and key risks |
+| `architecture.md` | Which structure and constraints realize it, and why | Structure and dependencies, design decisions (ADRs), persistence and migration, shared implementation conventions, how non-functional targets are met |
+| `tests.md` | What to verify, how far, in which environment, and by which criteria | Test scope, test levels and tools, test environments and external boundaries, quality gates and criteria, exit criteria, key risks and verification limits |
 
 Existing conventions decide where the documents live. Without one, they go under an existing `docs/` directory, or at the repository root if there is none.
 
 ### What it does
 
-- If none of the three documents exist, creates them from templates; if they exist, updates only the relevant sections as a diff. It never rewrites an existing document wholesale.
-- In a monorepo, can keep a set of the three documents per service, indexed from the `architecture.md` of the set for the whole repository. A document too large to update one section at a time can be split by feature into a directory of the same name, with the original file kept as the index. Either split is proposed and made in its own design PR that changes only the structure.
+- If none of the four documents exist, creates them from templates; if they exist, updates only the relevant sections as a diff. It never rewrites an existing document wholesale.
+- In a monorepo, can keep a set of the four documents per service, indexed from the `architecture.md` of the set for the whole repository. A document too large to update one section at a time can be split by feature into a directory of the same name, with the original file kept as the index. Either split is proposed and made in its own design PR that changes only the structure.
 - If an Issue holds several requirements that each deliver value on their own, stops before designing, shows how to split it, and asks you to file one Issue per requirement with `/dev-process-kit:issue`. It does not create, edit, or close Issues itself.
 - Writes the documents as finished work. For undecided design, picks the most reasonable option and writes it as the specification with its reason, without markers such as `仮定` (assumption), `未承認` (unapproved), or `TBD`. It asks in design PR comments whether each choice is right and reflects the answers by rewriting the sections.
 - Even when creating design documents from existing code, it does not leave pending-confirmation markers in the documents. It distinguishes current behavior read from the code from newly chosen options in the PR body and PR comments, and asks whether to ratify that behavior as the specification. Before ratification, a mismatch between that description and the code is treated as something to verify rather than as a defect in the code; if a difference turns up after the design PR is merged, it is reported via an Issue so a person can decide which side to adopt.
@@ -89,7 +90,7 @@ Existing conventions decide where the documents live. Without one, they go under
 
 ## `dev-process-kit:implement`
 
-Implements from the merged design documents, with one implementation PR per Issue. Source: [`skills/implement/SKILL.md`](../plugins/dev-process-kit/skills/implement/SKILL.md); PR and review handling: [`references/pr-and-review.md`](../plugins/dev-process-kit/skills/implement/references/pr-and-review.md); test definitions: [`unit-test.md`](../plugins/dev-process-kit/skills/implement/references/unit-test.md), [`integration-test.md`](../plugins/dev-process-kit/skills/implement/references/integration-test.md), [`scenario-test.md`](../plugins/dev-process-kit/skills/implement/references/scenario-test.md)
+Implements from the merged design documents, with one implementation PR per Issue. Source: [`skills/implement/SKILL.md`](../plugins/dev-process-kit/skills/implement/SKILL.md); PR and review handling: [`references/pr-and-review.md`](../plugins/dev-process-kit/skills/implement/references/pr-and-review.md); test definitions: [`unit-test.md`](../plugins/dev-process-kit/skills/implement/references/unit-test.md), [`integration-test.md`](../plugins/dev-process-kit/skills/implement/references/integration-test.md), [`scenario-test.md`](../plugins/dev-process-kit/skills/implement/references/scenario-test.md); quality gate and verification guardrails: [`quality-gate.md`](../plugins/dev-process-kit/skills/implement/references/quality-gate.md)
 
 ### When to use
 
@@ -114,7 +115,7 @@ It runs only when called by name. A general request such as "fix #12" does not s
 
   Constraints in `architecture.md` are enforced by the build structure or checked in PR review.
 - Builds parts with test-driven development (TDD), writing unit tests first and running Red → Green → Refactor for one TODO list item at a time.
-- Once a feature works, writes integration tests: inputs and expected results come from the specification, and the parts inside the system boundary are integrated without test doubles. Outside the boundary, it uses the provider's test environment when available; if there is no test environment, it uses test doubles and records the unverified scope in the PR body. If a test environment exists but its credentials are missing in the working environment, it proceeds with test doubles for what can be verified and records the unverified scope and reason in the PR body; because the user decides whether tests connected to the external service are needed, it asks the user in a PR comment (keeping the PR in Draft) unless `architecture.md` or user instructions already define the policy, and suggests recording the policy (such as running only in CI with secrets) and verification limits in `architecture.md` via a PR comment when needed.
+- Once a feature works, writes integration tests: inputs and expected results come from the specification, and the parts inside the system boundary are integrated without test doubles. Outside the boundary, it uses the provider's test environment when available; if there is no test environment, it uses test doubles and records the unverified scope in the PR body. If a test environment exists but its credentials are missing in the working environment, it proceeds with test doubles for what can be verified and records the unverified scope and reason in the PR body; because the user decides whether tests connected to the external service are needed, it asks the user in a PR comment (keeping the PR in Draft) unless `tests.md` or user instructions already define the policy, and suggests recording the policy (such as running only in CI with secrets) and verification limits in `tests.md` via a PR comment when needed.
 - Once the business flow works end to end, writes scenario tests: the business procedure in the business requirements becomes the test procedure, as UI tests for GUI apps or test scripts for batch jobs.
 - Measures coverage with unit and integration tests, not scenario tests.
 - Writes tests so they read as a specification: in the same language as the design documents, grouped by the context of the specification, with names that include the expected result.
@@ -127,7 +128,7 @@ It runs only when called by name. A general request such as "fix #12" does not s
 - Writes a `Closes #<number>` line of its own in the implementation PR body from the start. It finds the design PR and implementation PR for the same Issue by these lines, not by full-text search alone, so PRs that merely mention the number are not picked up. The body also lists the test for each acceptance criterion, and separates verified from unverified checks.
 - Reads design documents in any language, finding each section by its role rather than its heading. Treats any word or note marking a part as undecided or unapproved as a marker of undecided design, whatever the language (`仮定`, `TBD`, `Assumption`, `Unapproved`, and so on), and stops before implementing it. Writes the PR body and comments in the language set by the repository's rules or your instructions, or else in the language of the design documents.
 - With service sets or split documents, reads the target service's set and only the relevant split files, found through the indexes.
-- Keeps the PR in Draft and asks in PR comments while anything waits on a human decision. It marks the PR Ready for review only after the quality gates pass and automated checks are addressed. When neither repository rules nor your instructions define a quality gate, it runs the existing tests, builds, type checks, and linters that can be executed locally, separates what it ran from what it did not run in the PR body's verification section, and suggests defining a quality gate in `architecture.md` via a PR comment when needed.
+- Keeps the PR in Draft and asks in PR comments while anything waits on a human decision. It marks the PR Ready for review only after the quality gates defined in `tests.md`, repository rules, or your instructions pass and automated checks are addressed, following the verification guardrails in `references/quality-gate.md` (never treating unrun or empty checks as passing, never loosening thresholds or hiding exit codes, and separating verified, failed, out-of-scope, and unverified results). When no quality gate is defined, it runs the existing tests, builds, type checks, and linters that can be executed locally, separates what it ran from what it did not run in the PR body's verification section, and suggests defining a quality gate in `tests.md` via a PR comment when needed.
 - After Ready for review, pushes once per batch of review fixes.
 - Follows the repository's rules or your instructions for how to incorporate the integration branch into the implementation branch (merge or rebase), defaulting to merge. After a rebase, it pushes with `--force-with-lease` and avoids rebasing or force-pushing after Ready for review unless required by repository rules or your instructions.
 

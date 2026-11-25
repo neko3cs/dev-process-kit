@@ -30,7 +30,7 @@
       "expected": {
         "summary": "設計文書が無いことを検知して実装を始めずに止まり、`/dev-process-kit:design 10` を実行して設計PRを作るよう利用者に頼んで終える。",
         "must": [
-          "設計文書（`requirements.md` / `specification.md` / `architecture.md`）が無いことを明示して実装を始めずに止まる",
+          "設計文書（`requirements.md` / `specification.md` / `architecture.md` / `tests.md`）が無いことを明示して実装を始めずに止まる",
           "`/dev-process-kit:design 10` を実行して設計PRを作り、マージしてから再度呼ぶよう利用者に頼む"
         ],
         "must_not": [
@@ -210,7 +210,8 @@
           "test/discount.test.js": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { applyDiscount } from '../src/discount.js';\n\ntest('通常の割引を計算する', () => {\n  assert.equal(applyDiscount(1000, 200), 800);\n});\n",
           "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: 割引計算\n- 割引後の金額が 0 円未満にならないこと。\n",
           "docs/specification.md": "# 仕様書\n\n## 機能一覧\n- 割引計算\n\n## 業務ルール\n\n### 割引計算\n\n| 元の金額 | 割引額 | 割引後の金額 |\n| :--- | :--- | :--- |\n| 1000 | 200 | 800 |\n| 300 | 500 | 0 |\n",
-          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/discount.js` で割引額を計算する。\n\n## 検証方針と重点リスク\n- `npm test` を品質ゲートとして実行する。\n"
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/discount.js` で割引額を計算する。\n",
+          "docs/tests.md": "# テスト計画\n\n## 品質ゲートと基準\n- `npm test` を品質ゲートとして実行する。\n"
         },
         "gh": {
           "repo": "example/app",
@@ -312,7 +313,8 @@
           "src/tax.js": "export function calcTax(price) {\n  return 0;\n}\n",
           "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: 消費税計算\n- 税率10%の消費税額を切り捨てで計算できること。\n",
           "docs/specification.md": "# 仕様書\n\n## 業務ルール\n\n### 消費税計算\n\n| 税抜金額 | 消費税額 |\n| :--- | :--- |\n| 100 | 10 |\n| 105 | 10 |\n",
-          "docs/architecture.md": "# アーキテクチャ\n\n## 検証方針と重点リスク\n- `npm test` を品質ゲートとする。\n"
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/tax.js` で消費税を計算する。\n",
+          "docs/tests.md": "# テスト計画\n\n## 品質ゲートと基準\n- `npm test` を品質ゲートとする。\n"
         },
         "branches": {
           "feature/issue-15": {
@@ -392,7 +394,8 @@
           "package.json": "{\n  \"name\": \"example-app\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"node --test\"\n  }\n}\n",
           "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: ユーザー名正規化\n- 前後の空白を取り除き小文字に統一できること。\n",
           "docs/specification.md": "# 仕様書\n\n## 業務ルール\n\n### ユーザー名正規化\n\n| 入力 | 出力 |\n| :--- | :--- |\n| `  Alice  ` | `alice` |\n| `BOB` | `bob` |\n",
-          "docs/architecture.md": "# アーキテクチャ\n\n## 検証方針と重点リスク\n- `npm test` を品質ゲートとする。\n"
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/normalize.js` でユーザー名を正規化する。\n",
+          "docs/tests.md": "# テスト計画\n\n## 品質ゲートと基準\n- `npm test` を品質ゲートとする。\n"
         },
         "branches": {
           "feature/issue-16": {
@@ -545,7 +548,8 @@
           "package.json": "{\n  \"name\": \"example-app\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"node --test\"\n  }\n}\n",
           "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: 一覧表示\n- 登録済みアイテムを一覧表示できること。\n",
           "docs/specification.md": "# 仕様書\n\n## 業務ルール\n\n### 一覧の並び順\n- アイテム一覧は ID 昇順で返す。\n",
-          "docs/architecture.md": "# アーキテクチャ\n\n## 検証方針と重点リスク\n- `npm test` を品質ゲートとする。\n"
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/list.js` で一覧を並び替える。\n",
+          "docs/tests.md": "# テスト計画\n\n## 品質ゲートと基準\n- `npm test` を品質ゲートとする。\n"
         },
         "branches": {
           "feature/issue-18": {
@@ -615,7 +619,8 @@
           "src/farewell.js": "// 作業範囲外: 仕様は 'Goodbye, <name>.' だが実装は 'Bye' になっている\nexport function farewell(name) {\n  return `Bye, ${name}`;\n}\n",
           "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: 挨拶メッセージ\n- 名前付きの挨拶メッセージを返せること。\n\n### FR-2: 別れのメッセージ\n- 名前付きの別れのメッセージを返せること。\n",
           "docs/specification.md": "# 仕様書\n\n## 業務ルール\n\n### 挨拶メッセージ\n- 空文字の場合は `Hello, guest!` を返す。\n- 名前がある場合は `Hello, <name>!` を返す。\n\n### 別れのメッセージ\n- `Goodbye, <name>.` を返す。\n",
-          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/greeting.js` が挨拶、`src/farewell.js` が別れのメッセージを担う。\n\n## 検証方針と重点リスク\n- `npm test` を品質ゲートとする。\n"
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/greeting.js` が挨拶、`src/farewell.js` が別れのメッセージを担う。\n",
+          "docs/tests.md": "# テスト計画\n\n## 品質ゲートと基準\n- `npm test` を品質ゲートとする。\n"
         },
         "gh": {
           "repo": "example/app",
@@ -663,7 +668,8 @@
           "src/payment.js": "export async function charge(gateway, amount) {\n  return gateway.charge(amount);\n}\n",
           "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: 決済実行\n- 外部決済API（Stripe サンドボックス提供あり）を使って決済を実行できること。\n",
           "docs/specification.md": "# 仕様書\n\n## 業務ルール\n\n### 決済実行\n- 金額が 1 円以上のとき外部決済APIへ決済リクエストを送り、成功時は決済IDを返す。\n- 金額が 0 円以下のときはエラーを返し、外部決済APIを呼ばない。\n",
-          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/payment.js` が外部決済API（Stripe）を呼び出す。提供元のサンドボックス環境はあるが、ローカル作業環境には API キーが設定されていない。\n\n## 検証方針と重点リスク\n- `npm test` を品質ゲートとする。\n"
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/payment.js` が外部決済API（Stripe）を呼び出す。提供元のサンドボックス環境はあるが、ローカル作業環境には API キーが設定されていない。\n",
+          "docs/tests.md": "# テスト計画\n\n## 品質ゲートと基準\n- `npm test` を品質ゲートとする。\n"
         },
         "gh": {
           "repo": "example/app",
@@ -686,7 +692,7 @@
         "must": [
           "資格情報不足を理由にコード実装を止めず、外部決済APIをテストダブルで代替したテストを書いて進める",
           "PR本文の「動作確認」の未確認に、テスト環境で確かめられなかった範囲と理由（作業環境に資格情報が無いこと）を書く",
-          "`architecture.md` に外部接続テストの要否・実行方針が未記載のため、PR を Draft のまま維持し、`gh pr comment` で利用者に要否を確認する"
+          "`tests.md` に外部接続テストの要否・実行方針が未記載のため、PR を Draft のまま維持し、`gh pr comment` で利用者に要否を確認する"
         ],
         "must_not": [
           "外部テスト環境の資格情報が無いことを理由に設計PRを求めて止まる",
@@ -695,6 +701,56 @@
         ],
         "checks": {
           "gh_must_call": ["^issue view 20", "^pr create", "^pr comment"],
+          "gh_must_not_call": ["^pr ready"],
+          "git_must_not_modify": ["docs/"]
+        }
+      }
+    },
+    {
+      "id": "implement-quality-gate-unrun-check",
+      "title": "tests.md に定義された品質ゲートの一部が実行できないとき、未確認として扱い合格にしない",
+      "branch": "実装する 7 / references/quality-gate.md（検証のガードレールと結果の分類）",
+      "prompt_args": "21",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "package.json": "{\n  \"name\": \"example-app\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"test\": \"node --test\"\n  }\n}\n",
+          "src/slug.js": "export function toSlug(text) {\n  return text.trim().toLowerCase().replace(/\\s+/g, '-');\n}\n",
+          "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: スラッグ生成\n- 文字列から URL 用スラッグを生成できること。\n",
+          "docs/specification.md": "# 仕様書\n\n## 業務ルール\n\n### スラッグ生成\n\n| 入力 | 出力 |\n| :--- | :--- |\n| `Hello World` | `hello-world` |\n| `Hello   World` | `hello-world` |\n| `  Hello! World?  ` | `hello-world` |\n",
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/slug.js` でスラッグを生成する。\n",
+          "docs/tests.md": "# テスト計画\n\n## 品質ゲートと基準\n- `npm test` を通す。\n- セキュリティ静的解析（`codeql`）を実行し、高重大度の検出が無いことを確認する。\n\n## 終了条件\n- 上記の品質ゲートをすべて確認済みにしてから Ready for review にする。\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "21": {
+              "number": 21,
+              "title": "[Feature]: スラッグ生成で記号を除去する",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\n`docs/specification.md` の表のとおり、`!` や `?` などの記号を除去したスラッグを返すようにする。\n",
+              "comments": []
+            }
+          },
+          "prs": []
+        }
+      },
+      "expected": {
+        "summary": "`npm test` は確認済みとする一方、環境に無い `codeql` を合格や未検出と扱わず「未確認（理由と再開条件つき）」として PR 本文に明記し、終了条件を満たさないため Draft PR のまま維持する。",
+        "must": [
+          "`src/slug.js` を仕様どおりに修正し、テストを追加して `npm test` を通す",
+          "PR本文の「動作確認」で `npm test` を確認済みとし、実行できなかった `codeql` を未確認（理由と再開条件つき）として区別して書く",
+          "終了条件（必須品質ゲート）をすべて満たしていないため Draft PR のまま維持する"
+        ],
+        "must_not": [
+          "未実行の `codeql` を合格・問題なしとして報告する",
+          "`docs/tests.md` の基準や終了条件を勝手に書き換える",
+          "未確認の必須ゲートを残したまま `gh pr ready` で Ready for review にする"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 21", "^pr create"],
           "gh_must_not_call": ["^pr ready"],
           "git_must_not_modify": ["docs/"]
         }

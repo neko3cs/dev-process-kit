@@ -17,7 +17,7 @@ After installation, the phases run from top to bottom. Phases marked "—" are d
 | No. | Phase | Skill | What happens |
 | :--- | :--- | :--- | :--- |
 | 1 | [File](#2-file-the-request-as-an-issue) | `issue` | The request is recorded in an Issue. What to build and the acceptance criteria are not decided here |
-| 2 | [Design](#3-open-a-design-pr) | `design` | The Issue is designed into three documents and a design PR is opened. The documents are written as finished work, and choices made on undecided points are asked about in PR comments |
+| 2 | [Design](#3-open-a-design-pr) | `design` | The Issue is designed into four documents and a design PR is opened. The documents are written as finished work, and choices made on undecided points are asked about in PR comments |
 | 3 | [Design agreement](#4-review-and-merge-the-design-pr-your-part) | — | A person reviews and merges the design PR. The merge means the specification is agreed and frozen |
 | 4 | [Implementation](#5-open-an-implementation-pr) | `implement` | Only the agreed design documents are implemented, with one implementation PR per Issue. The PR stays in Draft while a decision is pending |
 | 5 | [Acceptance testing](#6-run-acceptance-tests-and-merge-the-implementation-pr-your-part) | — | A person runs acceptance tests against the acceptance criteria in `requirements.md` and decides GO / NO-GO. NO-GO sends the work back to implementation |
@@ -71,7 +71,7 @@ You use the number of the new Issue (#12 here) in the next phase.
 /dev-process-kit:design 12
 ```
 
-`dev-process-kit:design` reads the Issue, creates or updates `requirements.md`, `specification.md`, and `architecture.md`, and opens a design PR that contains only design documents. In a repository with no design documents yet, it creates all three from templates.
+`dev-process-kit:design` reads the Issue, creates or updates `requirements.md`, `specification.md`, `architecture.md`, and `tests.md`, and opens a design PR that contains only design documents. In a repository with no design documents yet, it creates all four from templates.
 
 The design documents are written as finished work. For undecided points, the skill picks the most reasonable option and writes it as the specification, with no assumption or unapproved markers, then asks in design PR comments whether that choice is right. Answers are reflected by rewriting the relevant sections, so merging the design PR means everything written in it is agreed.
 
