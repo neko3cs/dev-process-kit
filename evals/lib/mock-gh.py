@@ -61,6 +61,44 @@ def has_flag(args: list[str], *names: str) -> bool:
     return any(arg in names for arg in args)
 
 
+def extract_positional_arg(args: list[str], flags_with_arg: set[str]) -> str:
+    skip_next = False
+    for arg in args:
+        if skip_next:
+            skip_next = False
+            continue
+        if arg in flags_with_arg:
+            skip_next = True
+            continue
+        if arg.startswith("-"):
+            continue
+        return arg
+    return ""
+
+
+def current_git_branch() -> str:
+    proc = subprocess.run(["git", "branch", "--show-current"], text=True, capture_output=True, check=False)
+    return proc.stdout.strip()
+
+
+ISSUE_FLAGS_WITH_ARG = {
+    "-R", "--repo", "--jq", "-q", "--json", "-t", "--title", "-b", "--body",
+    "-F", "--body-file", "-l", "--label", "--add-label", "--remove-label",
+    "-a", "--assignee", "--add-assignee", "--remove-assignee", "-m", "--milestone",
+    "-p", "--project", "-S", "--search", "-s", "--state", "-L", "--limit",
+    "--template", "--parent",
+}
+
+PR_FLAGS_WITH_ARG = {
+    "-R", "--repo", "--jq", "-q", "--json", "-t", "--title", "-b", "--body",
+    "-F", "--body-file", "-l", "--label", "--add-label", "--remove-label",
+    "-a", "--assignee", "--add-assignee", "--remove-assignee", "-m", "--milestone",
+    "-p", "--project", "-S", "--search", "-s", "--state", "-L", "--limit",
+    "-H", "--head", "-B", "--base", "-r", "--reviewer", "--add-reviewer",
+    "--remove-reviewer", "--template",
+}
+
+
 def read_body_from_args(args: list[str]) -> str | None:
     body = extract_flag_value(args, "--body", "-b")
     if body is not None:
@@ -155,7 +193,7 @@ def format_pr_view(pr: dict[str, Any], include_comments: bool) -> str:
     return "\n".join(lines)
 
 
-def handle_issue(args: list[str], state: dict[str, Any], state_path: Path) -> int:
+def handle_issue(args: list[str], state: dict[str, Any], state_path: Path, body: str | None) -> int:
     if not args:
         sys.stderr.write("mock-gh: missing issue subcommand\n")
         return 1
@@ -166,8 +204,7 @@ def handle_issue(args: list[str], state: dict[str, Any], state_path: Path) -> in
     json_fields = extract_flag_value(rest, "--json")
 
     if sub == "view":
-        num = next((a for a in rest if not a.startswith("-")), "")
-        num = num.lstrip("#")
+        num = extract_positional_arg(rest, ISSUE_FLAGS_WITH_ARG).lstrip("#")
         issue = issues.get(num)
         if not issue:
             sys.stderr.write(f"GraphQL: Could not resolve to an Issue with the number of {num}.\n")
@@ -211,11 +248,10 @@ def handle_issue(args: list[str], state: dict[str, Any], state_path: Path) -> in
                     return 1
         next_num = max((int(k) for k in issues.keys() if k.isdigit()), default=100) + 1
         title = extract_flag_value(rest, "--title", "-t") or ""
-        body = read_body_from_args(rest) or ""
         issues[str(next_num)] = {
             "number": next_num,
             "title": title,
-            "body": body,
+            "body": body or "",
             "state": "OPEN",
             "labels": [{"name": l} for l in req_labels],
             "author": {"login": state.get("user", "agent-user")},
@@ -226,24 +262,22 @@ def handle_issue(args: list[str], state: dict[str, Any], state_path: Path) -> in
         return 0
 
     if sub == "comment":
-        num = next((a for a in rest if not a.startswith("-")), "").lstrip("#")
-        body = read_body_from_args(rest) or ""
+        num = extract_positional_arg(rest, ISSUE_FLAGS_WITH_ARG).lstrip("#")
         issue = issues.setdefault(
             num, {"number": int(num) if num.isdigit() else num, "title": "", "body": "", "comments": []}
         )
         cid = 1000 + len(issue.setdefault("comments", [])) + 1
         issue["comments"].append(
-            {"id": cid, "author": {"login": state.get("user", "agent-user")}, "body": body}
+            {"id": cid, "author": {"login": state.get("user", "agent-user")}, "body": body or ""}
         )
         save_state(state_path, state)
         print(f"https://github.com/{repo}/issues/{num}#issuecomment-{cid}")
         return 0
 
     if sub == "edit":
-        num = next((a for a in rest if not a.startswith("-")), "").lstrip("#")
+        num = extract_positional_arg(rest, ISSUE_FLAGS_WITH_ARG).lstrip("#")
         issue = issues.get(num)
         if issue:
-            body = read_body_from_args(rest)
             if body is not None:
                 issue["body"] = body
             title = extract_flag_value(rest, "--title", "-t")
@@ -257,7 +291,7 @@ def handle_issue(args: list[str], state: dict[str, Any], state_path: Path) -> in
     return 1
 
 
-def handle_pr(args: list[str], state: dict[str, Any], state_path: Path) -> int:
+def handle_pr(args: list[str], state: dict[str, Any], state_path: Path, body: str | None) -> int:
     if not args:
         sys.stderr.write("mock-gh: missing pr subcommand\n")
         return 1
@@ -267,11 +301,20 @@ def handle_pr(args: list[str], state: dict[str, Any], state_path: Path) -> int:
     jq_expr = extract_flag_value(rest, "--jq", "-q")
     json_fields = extract_flag_value(rest, "--json")
 
-    def find_pr(num_str: str) -> dict[str, Any] | None:
+    def find_pr(num_str: str, fallback_first: bool = False) -> dict[str, Any] | None:
         n = num_str.lstrip("#")
-        for pr in prs:
-            if str(pr.get("number")) == n:
-                return pr
+        if n:
+            for pr in prs:
+                if str(pr.get("number")) == n:
+                    return pr
+            return None
+        branch = current_git_branch()
+        if branch:
+            for pr in prs:
+                if pr.get("headRefName") == branch:
+                    return pr
+        if fallback_first and prs:
+            return prs[0]
         return None
 
     if sub == "list":
@@ -302,8 +345,8 @@ def handle_pr(args: list[str], state: dict[str, Any], state_path: Path) -> int:
         return 0
 
     if sub == "view":
-        num = next((a for a in rest if not a.startswith("-")), "")
-        pr = find_pr(num) if num else (prs[0] if prs else None)
+        num = extract_positional_arg(rest, PR_FLAGS_WITH_ARG)
+        pr = find_pr(num, fallback_first=True)
         if not pr:
             sys.stderr.write(f"no pull requests found for {num}\n")
             return 1
@@ -315,8 +358,8 @@ def handle_pr(args: list[str], state: dict[str, Any], state_path: Path) -> int:
         return 0
 
     if sub == "diff":
-        num = next((a for a in rest if not a.startswith("-")), "")
-        pr = find_pr(num) if num else (prs[0] if prs else None)
+        num = extract_positional_arg(rest, PR_FLAGS_WITH_ARG)
+        pr = find_pr(num, fallback_first=True)
         if not pr:
             sys.stderr.write(f"no pull requests found for {num}\n")
             return 1
@@ -330,17 +373,13 @@ def handle_pr(args: list[str], state: dict[str, Any], state_path: Path) -> int:
     if sub == "create":
         next_num = max((int(pr.get("number", 0)) for pr in prs), default=200) + 1
         title = extract_flag_value(rest, "--title", "-t") or ""
-        body = read_body_from_args(rest) or ""
         is_draft = has_flag(rest, "--draft", "-d")
-        head_ref = extract_flag_value(rest, "--head", "-H") or ""
-        if not head_ref:
-            proc = subprocess.run(["git", "branch", "--show-current"], text=True, capture_output=True, check=False)
-            head_ref = proc.stdout.strip()
+        head_ref = extract_flag_value(rest, "--head", "-H") or current_git_branch()
         prs.append(
             {
                 "number": next_num,
                 "title": title,
-                "body": body,
+                "body": body or "",
                 "state": "OPEN",
                 "isDraft": is_draft,
                 "headRefName": head_ref,
@@ -354,41 +393,42 @@ def handle_pr(args: list[str], state: dict[str, Any], state_path: Path) -> int:
         return 0
 
     if sub == "edit":
-        num = next((a for a in rest if not a.startswith("-")), "")
+        num = extract_positional_arg(rest, PR_FLAGS_WITH_ARG)
         pr = find_pr(num)
         if pr:
-            body = read_body_from_args(rest)
             if body is not None:
                 pr["body"] = body
             title = extract_flag_value(rest, "--title", "-t")
             if title is not None:
                 pr["title"] = title
             save_state(state_path, state)
-        print(f"https://github.com/{repo}/pull/{num}")
+        pr_num = pr.get("number") if pr else num.lstrip("#")
+        print(f"https://github.com/{repo}/pull/{pr_num}")
         return 0
 
     if sub == "ready":
-        num = next((a for a in rest if not a.startswith("-")), "")
+        num = extract_positional_arg(rest, PR_FLAGS_WITH_ARG)
         pr = find_pr(num)
         undo = has_flag(rest, "--undo")
         if pr:
             pr["isDraft"] = undo
             save_state(state_path, state)
-        print(f"https://github.com/{repo}/pull/{num}")
+        pr_num = pr.get("number") if pr else num.lstrip("#")
+        print(f"https://github.com/{repo}/pull/{pr_num}")
         return 0
 
     if sub == "comment":
-        num = next((a for a in rest if not a.startswith("-")), "")
-        body = read_body_from_args(rest) or ""
+        num = extract_positional_arg(rest, PR_FLAGS_WITH_ARG)
         pr = find_pr(num)
         cid = 2000
         if pr:
             cid = 2000 + len(pr.setdefault("comments", [])) + 1
             pr["comments"].append(
-                {"id": cid, "author": {"login": state.get("user", "agent-user")}, "body": body}
+                {"id": cid, "author": {"login": state.get("user", "agent-user")}, "body": body or ""}
             )
             save_state(state_path, state)
-        print(f"https://github.com/{repo}/pull/{num}#issuecomment-{cid}")
+        pr_num = pr.get("number") if pr else num.lstrip("#")
+        print(f"https://github.com/{repo}/pull/{pr_num}#issuecomment-{cid}")
         return 0
 
     sys.stderr.write(f"mock-gh: unsupported pr subcommand: {sub}\n")
@@ -411,24 +451,15 @@ def handle_label(args: list[str], state: dict[str, Any]) -> int:
     return 0
 
 
-def handle_api(args: list[str], state: dict[str, Any], state_path: Path) -> int:
+def handle_api(args: list[str], state: dict[str, Any], state_path: Path, body: str | None) -> int:
     method = (extract_flag_value(args, "-X", "--method") or "GET").upper()
     jq_expr = extract_flag_value(args, "--jq", "-q")
-    # Find endpoint (first positional arg not consumed by flags)
-    endpoint = ""
-    skip_next = False
     flags_with_arg = {"-X", "--method", "--jq", "-q", "-f", "--raw-field", "-F", "--field", "-H", "--header"}
-    for a in args:
-        if skip_next:
-            skip_next = False
-            continue
-        if a in flags_with_arg:
-            skip_next = True
-            continue
-        if a.startswith("-"):
-            continue
-        endpoint = a.lstrip("/")
-        break
+    raw_endpoint = extract_positional_arg(args, flags_with_arg).lstrip("/")
+    endpoint = raw_endpoint.split("?", 1)[0]
+    repo = state.get("repo", "example/app")
+    owner, repo_name = repo.split("/", 1) if "/" in repo else ("example", repo)
+    endpoint = endpoint.replace("{owner}", owner).replace("{repo}", repo_name)
 
     if endpoint == "user":
         print(apply_jq({"login": state.get("user", "agent-user")}, jq_expr))
@@ -457,8 +488,13 @@ def handle_api(args: list[str], state: dict[str, Any], state_path: Path) -> int:
     m_patch_comment = re.match(r"^repos/[^/]+/[^/]+/issues/comments/(\d+)$", endpoint)
     if m_patch_comment and method == "PATCH":
         cid = int(m_patch_comment.group(1))
-        body = read_body_from_args(args) or ""
-        print(apply_jq({"id": cid, "body": body}, jq_expr))
+        new_body = body or ""
+        for issue in state.get("issues", {}).values():
+            for c in issue.get("comments", []):
+                if c.get("id") == cid:
+                    c["body"] = new_body
+                    save_state(state_path, state)
+        print(apply_jq({"id": cid, "body": new_body}, jq_expr))
         return 0
 
     m_pr_comments = re.match(r"^repos/[^/]+/[^/]+/pulls/(\d+)/comments$", endpoint)
@@ -473,8 +509,7 @@ def handle_api(args: list[str], state: dict[str, Any], state_path: Path) -> int:
 
     m_reply = re.match(r"^repos/[^/]+/[^/]+/pulls/(\d+)/comments/(\d+)/replies$", endpoint)
     if m_reply:
-        body = read_body_from_args(args) or ""
-        print(apply_jq({"id": 9001, "body": body}, jq_expr))
+        print(apply_jq({"id": 9001, "body": body or ""}, jq_expr))
         return 0
 
     print(apply_jq({}, jq_expr))
@@ -523,13 +558,13 @@ def main() -> int:
 
     cmd, rest = args[0], args[1:]
     if cmd == "issue":
-        return handle_issue(rest, state, state_path)
+        return handle_issue(rest, state, state_path, body)
     if cmd == "pr":
-        return handle_pr(rest, state, state_path)
+        return handle_pr(rest, state, state_path, body)
     if cmd == "label":
         return handle_label(rest, state)
     if cmd == "api":
-        return handle_api(rest, state, state_path)
+        return handle_api(rest, state, state_path, body)
     if cmd == "repo":
         return handle_repo(rest, state)
     if cmd == "auth":
