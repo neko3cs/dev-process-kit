@@ -2,7 +2,7 @@
 
 [English](skills.md) | 日本語
 
-dev-process-kit の3つのスキルが、何を読み、何を作り、何をしないかをまとめます。手順の詳細と判断基準は、各スキルの `SKILL.md` が正本です。スキルのファイルは日本語で書かれていますが、作る Issue・設計文書・PR は対象リポジトリの言語に合わせます。
+dev-process-kit の3つのスキルが、何を読み、何を作り、何をしないかをまとめます。手順の詳細と判断基準は、各スキルの `SKILL.md` と `references/` 配下の参考資料が正本です。スキルのファイルは日本語で書かれていますが、作る Issue・設計文書・PR は対象リポジトリの言語に合わせます。
 
 | スキル | 工程 | 読むもの | 作るもの |
 | :--- | :--- | :--- | :--- |
@@ -14,7 +14,7 @@ dev-process-kit の3つのスキルが、何を読み、何を作り、何をし
 
 ## `dev-process-kit:issue`
 
-要望を GitHub Issue に起票します。正本: [`skills/issue/SKILL.md`](../plugins/dev-process-kit/skills/issue/SKILL.md)
+要望を GitHub Issue に起票します。正本: [`skills/issue/SKILL.md`](../plugins/dev-process-kit/skills/issue/SKILL.md)、テンプレートと `gh` 操作: [`references/templates-and-gh.md`](../plugins/dev-process-kit/skills/issue/references/templates-and-gh.md)
 
 ### 使う場面
 
@@ -29,13 +29,13 @@ dev-process-kit の3つのスキルが、何を読み、何を作り、何をし
 
 ### 動き
 
-- 起票のたびに、対象リポジトリの `.github/ISSUE_TEMPLATE/` を読み直します。無ければ、所有者の `.github` リポジトリのテンプレートを使います。どちらにも無ければ、説明・動機と背景・受け入れ条件の見出しで書きます。`config.yml` はテンプレート選択画面の設定でテンプレートではないため、候補にしません。テンプレートがあれば、`blank_issues_enabled` の値に関わらず必ずどれかに従います。
+- 起票のたびに、対象リポジトリの `.github/ISSUE_TEMPLATE/` を読み直します。無ければ、所有者の `.github` リポジトリのテンプレートを使います。どちらにも無ければ、説明・動機と背景・受け入れ条件の見出しで書きます。`config.yml`・`config.yaml` はテンプレート選択画面の設定でテンプレートではないため、候補にしません。テンプレートがあれば、`blank_issues_enabled` の値に関わらず必ずどれかに従います。
 - Issue Forms の `type: markdown` の要素は、GitHub の送信時と同じく本文に含めません。テンプレートのタイトルのプレフィックスとラベルに加え、`assignees`・`projects`・`type` も設定します。テンプレートのラベルが対象リポジトリに無ければ、ラベルは作りません。そのラベルを外して起票し、付けられなかったラベルを利用者に伝えます。
 - 必須フィールドは必ず埋めます。本文は完成した要望として書きます。決まっていない部分は最も妥当な内容を選び、`仮定`・`TBD` などの印を付けずに要望として書きます。確認のために起票を止めず、その内容でよいかを Issue コメントで質問します。
 - Issue は要件ごとに1つ起票します。依頼に、それぞれ単独で価値を届けられる要件が複数あれば、分け方（Issue ごとのタイトルと要件）を示し、別々の Issue に分けて起票してよいかを確認してから起票します。親子の Issue は使わず、一緒に起票したほかの Issue の番号を各 Issue にコメントします。
 - 内容の精査で確かめられるチェック項目（「機密情報を含めていない」など）は、本文を精査してからチェックします。利用者本人の同意・確認を表す項目（行動規範への同意、重複を探したことなど）は、代わりにチェックしません。会話で同意・確認を明言していなければ、項目の文言を示して起票前に確認します。同意が得られなければチェックせず、必須の項目なら起票しません。
 - 本文とコメントに書くのは、要望と、リポジトリに関する事実（コードの挙動、外部仕様、調査結果、選ばなかった案とその技術的な理由など）だけです。会話で聞いた利用者自身の事情（取引先や社名、別の案件、社内の予定、個人的な事情など）は、書くよう明示的に頼まれない限り書きません。動機に必要なら一般化して書きます。Issue はリポジトリを読める人すべてに見え、起票した時点で通知も届くため、後で消しても取り消せないためです。
-- 起票の前に止まるのは、要件の分け方の確認と、同意を表すチェック項目の確認だけです。どちらもあれば1回の質問にまとめます。
+- 起票の前に止まるのは、要件の分け方の確認、同意を表すチェック項目の確認、複数テンプレートから選び難いときの確認だけです。複数あっても1回の質問にまとめます。
 - リポジトリの規約や利用者の指示で決まる言語で書きます。決まっていなければ、テンプレートの言語、リポジトリの主な文書の言語（訳ではなく正本の言語）、会話の言語の順で決めます。テンプレートの見出し・タイトルのプレフィックス・ラベルは訳さずにそのまま使います。
 - 再現結果・環境・実測値などの事実は創作せず、未確認と書きます。
 - 本文には要望を書き、長い調査結果や経緯はコメントに分けます。同じ話題のコメントは、足さずに書き換えます。書き換えるのはエージェントが書いたコメントだけで、他人のコメントや、同じアカウントで利用者が自分で書いたコメントは書き換えません。それらの内容が古くなったら、新しいコメントで補足します。
@@ -47,7 +47,7 @@ dev-process-kit の3つのスキルが、何を読み、何を作り、何をし
 
 ## `dev-process-kit:design`
 
-Issue を3つの設計文書に設計し、設計 PR を作ります。正本: [`skills/design/SKILL.md`](../plugins/dev-process-kit/skills/design/SKILL.md)、判断基準: [`references/policy.md`](../plugins/dev-process-kit/skills/design/references/policy.md)
+Issue を3つの設計文書に設計し、設計 PR を作ります。正本: [`skills/design/SKILL.md`](../plugins/dev-process-kit/skills/design/SKILL.md)、判断基準: [`references/policy.md`](../plugins/dev-process-kit/skills/design/references/policy.md)、PR 作成とブランチ取り込み: [`references/pr-and-sync.md`](../plugins/dev-process-kit/skills/design/references/pr-and-sync.md)
 
 ### 使う場面
 
@@ -89,7 +89,7 @@ Issue を3つの設計文書に設計し、設計 PR を作ります。正本: [
 
 ## `dev-process-kit:implement`
 
-マージ済みの設計文書をもとに、Issue 1つにつき1つの実装 PR で実装します。正本: [`skills/implement/SKILL.md`](../plugins/dev-process-kit/skills/implement/SKILL.md)、テストの定義: [`unit-test.md`](../plugins/dev-process-kit/skills/implement/references/unit-test.md)・[`integration-test.md`](../plugins/dev-process-kit/skills/implement/references/integration-test.md)・[`scenario-test.md`](../plugins/dev-process-kit/skills/implement/references/scenario-test.md)
+マージ済みの設計文書をもとに、Issue 1つにつき1つの実装 PR で実装します。正本: [`skills/implement/SKILL.md`](../plugins/dev-process-kit/skills/implement/SKILL.md)、PR とレビュー対応: [`references/pr-and-review.md`](../plugins/dev-process-kit/skills/implement/references/pr-and-review.md)、テストの定義: [`unit-test.md`](../plugins/dev-process-kit/skills/implement/references/unit-test.md)・[`integration-test.md`](../plugins/dev-process-kit/skills/implement/references/integration-test.md)・[`scenario-test.md`](../plugins/dev-process-kit/skills/implement/references/scenario-test.md)
 
 ### 使う場面
 
