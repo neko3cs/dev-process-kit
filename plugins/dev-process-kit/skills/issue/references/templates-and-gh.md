@@ -15,13 +15,15 @@
 
 ## 2. テンプレートの探索と読み取り
 
-テンプレートは更新される可能性があるため、作成のたびに読み直し、記憶から補わない。補助スクリプトを使うと、対象リポジトリの `.github/ISSUE_TEMPLATE/`（無ければ所有者の `.github` リポジトリ）からの `config.yml` / `config.yaml` を除いたテンプレート取得と、既存ラベル一覧の取得（`gh label list`）をまとめて行える。
+テンプレートは更新される可能性があるため、作成のたびに読み直し、記憶から補わない。
+
+1. 対象リポジトリの `.github/ISSUE_TEMPLATE/` にあるテンプレートを読む。
+2. 無ければ、GitHub がテンプレートを引き継ぐ所有者の `.github` リポジトリの `.github/ISSUE_TEMPLATE/` を読む。
 
 ```bash
-python3 scripts/fetch-templates-and-labels.py [-R <owner>/<repo>] [--check-labels <カンマ区切りラベル>]
+gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE --jq '.[].name'
+gh api repos/<owner>/<repo>/contents/.github/ISSUE_TEMPLATE/<ファイル名> --jq '.content' | base64 -d
 ```
-
-スクリプトが使えない環境では、同じ手順を `gh` コマンドで直接実行する（`.github/ISSUE_TEMPLATE` を `gh api` で取得し base64 デコード）。
 
 - 候補は `.md`・`.yml`・`.yaml` のうち `config.yml`（または `config.yaml`）を除いたものとする。`config.yml` はテンプレート選択画面の設定（`blank_issues_enabled`、`contact_links`）で、テンプレートではない。
 - `blank_issues_enabled` の値に関わらず、テンプレートが1つでもあれば必ずどれかに従い、テンプレートを使わない空の Issue は作成しない。

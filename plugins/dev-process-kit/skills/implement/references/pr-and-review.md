@@ -11,14 +11,16 @@
 | 設計PR | `Refs #<番号>` |
 | 実装PR | `Closes #<番号>` |
 
-`<状態>` は探す PR に合わせて `open` か `merged` にする。補助スクリプトを使うと、`Refs`/`Closes` の独立行での絞り込みと `gh pr diff --name-only` による設計PR/実装PRの分類をまとめて行える。
+`<状態>` は探す PR に合わせて `open` か `merged` にする。
 
-```bash
-python3 scripts/find-issue-prs.py <番号> --state <open|merged> [--design-doc <パス> ...]
+```sh
+gh pr list --state <状態> --search "#<番号> in:body" --limit 100 \
+  --json number,title,body,isDraft,headRefName \
+  --jq '.[] | select(.body | test("(?m)^(Refs|Closes) #<番号>\\s*$")) | {number, title, isDraft, headRefName}'
 ```
 
-- 差分が設計文書だけのものを `design_prs`、それ以外を `impl_prs` とする（目印の行の種類ではなく差分で判定するため、誤って `Closes` が書かれた設計PRも見分けられる）。
-- 目印の行を持つ PR が無い場合は `fallback_candidates` に全文検索の候補が出るため、ルール導入前の PR らしいものがあれば本文と差分を読んで確かめてから扱う。
+- 絞り込んだ PR のうち、差分が設計文書だけのものを設計PR、それ以外を実装PRとする（`gh pr diff <PR番号> --name-only`）。目印の行の種類は設計PR/実装PRの見分けに使わない（誤って `Closes` が書かれた設計PRでも差分で見分けるため）。
+- 目印の行を持つ PR が無いのに、全文検索の候補に対象 Issue の PR らしいもの（ルール導入前の PR など）がある場合は、本文と差分を読んで確かめてから扱う。
 
 ## 2. 実装PR の作成・更新とコミット
 
@@ -27,7 +29,7 @@ python3 scripts/find-issue-prs.py <番号> --state <open|merged> [--design-doc <
 - コミットメッセージに `Refs #<番号>` を含める。
 - 実装PR の本文には、作成時から `Closes #<番号>` だけの独立行を書く（Draft のあいだも `Refs` にしない。書き換え忘れでマージ後に Issue が残るのを防ぐため）。
 - PR 本文・コメントの言語は規約や指示に従い、無ければ設計文書と同じ言語で書く（下の必須見出しも訳す）。
-- **PR テンプレートの探索**: 指定が無ければ、作成・本文更新のたびに `python3 scripts/find-pr-template.py [-R <owner>/<repo>]` で探して読み直す（対象リポジトリの `.github/`・直下・`docs/`・`.github/PULL_REQUEST_TEMPLATE/` → 無ければ所有者の `.github` リポジトリ）。非対話では自動適用されないためテンプレートの見出しと指示に従って本文を組み立て `--body-file` で渡し、テンプレートのコメントは残さない。
+- **PR テンプレートの探索**: 指定が無ければ、作成・本文更新のたびに `.github/`・リポジトリ直下・`docs/` の `pull_request_template.md` または `.github/PULL_REQUEST_TEMPLATE/` を探し、無ければ所有者の `.github` リポジトリの同じ場所（`gh api repos/<owner>/.github/contents/.github/pull_request_template.md --jq '.content' | base64 -d`）を読む。非対話では自動適用されないためテンプレートの見出しと指示に従って本文を組み立て `--body-file` で渡し、テンプレートのコメントは残さない。
 
 ### 実装PR 本文の必須項目
 

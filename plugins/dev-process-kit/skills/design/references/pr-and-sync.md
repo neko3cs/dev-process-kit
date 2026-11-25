@@ -4,11 +4,10 @@
 
 ## 1. PR テンプレートの探索と適用
 
-PR の起票方法と本文は、対象リポジトリの規約・指定された PR テンプレートに従う。テンプレートの指定が無ければ、作成・本文更新のたびに補助スクリプトで探して読み直し、構成を記憶から補わない（対象リポジトリの `.github/`・直下・`docs/`・`.github/PULL_REQUEST_TEMPLATE/` → 無ければ所有者の `.github` リポジトリの順に探索する）。
+PR の起票方法と本文は、対象リポジトリの規約・指定された PR テンプレートに従う。テンプレートの指定が無ければ、作成・本文更新のたびに次の順で探して読み直し、構成を記憶から補わない。
 
-```bash
-python3 scripts/find-pr-template.py [-R <owner>/<repo>]
-```
+1. 対象リポジトリの `.github/`・リポジトリ直下・`docs/` にある `pull_request_template.md`、または `.github/PULL_REQUEST_TEMPLATE/` の中のファイル
+2. 対象リポジトリに無ければ、GitHub がテンプレートを引き継ぐ所有者の `.github` リポジトリの同じ場所（`gh api repos/<owner>/.github/contents/.github/pull_request_template.md --jq '.content' | base64 -d`）
 
 `gh pr create` は非対話ではテンプレートを本文に当てないため、テンプレートの見出しとコメントの指示に従って本文を組み立て、`--body-file` で渡す。テンプレートのコメントは本文に残さない。
 
