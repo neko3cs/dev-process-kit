@@ -70,7 +70,7 @@ Existing conventions decide where the documents live. Without one, they go under
 
 ### What it does
 
-- If none of the four documents exist, creates them from templates; if they exist, updates only the relevant sections as a diff. It never rewrites an existing document wholesale.
+- If none of the four documents exist, creates them from templates; if they exist, updates only the relevant sections as a diff. It never rewrites an existing document wholesale. When only some of the documents exist, it creates a missing one from its template only if the change belongs in it (for example, `tests.md` for a change to the test plan); a missing document the change does not touch stays missing.
 - In a monorepo, can keep a set of the four documents per service, indexed from the `architecture.md` of the set for the whole repository. A document too large to update one section at a time can be split by feature into a directory of the same name, with the original file kept as the index. Either split is proposed and made in its own design PR that changes only the structure.
 - If an Issue holds several requirements that each deliver value on their own, stops before designing, shows how to split it, and asks you to file one Issue per requirement with `/dev-process-kit:issue`. It does not create, edit, or close Issues itself.
 - Writes the documents as finished work. For undecided design, picks the most reasonable option and writes it as the specification with its reason, without markers such as `仮定` (assumption), `未承認` (unapproved), or `TBD`. It asks in design PR comments whether each choice is right and reflects the answers by rewriting the sections.
