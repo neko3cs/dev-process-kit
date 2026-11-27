@@ -134,12 +134,60 @@
         "must_not": [
           "`src/shipping.js` を修正する",
           "設計文書の3000円以上無料の仕様をコードに合わせて5000円以上に変える",
-          "自分で不具合 Issue を起票する"
+          "自分で不具合 Issue を起票する",
+          "変更が当たらない `docs/tests.md` をテンプレートから新しく作る"
         ],
         "checks": {
           "gh_must_call": ["^issue view 14", "^pr create"],
           "gh_must_not_call": ["^issue create"],
-          "git_must_not_modify": ["src/shipping.js"]
+          "git_must_not_modify": ["src/shipping.js", "docs/tests.md"]
+        }
+      }
+    },
+    {
+      "id": "design-partial-docs-create-target",
+      "title": "設計文書が一部だけあるとき、変更が当たる無いファイルだけをテンプレートから作る",
+      "branch": "モード判定と手順（一部のみ: 変更が当たる無いファイルだけ新規作成）",
+      "prompt_args": "16",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n\nNode.js（Jest）で書かれた送料計算モジュールです。\n",
+          "package.json": "{\n  \"name\": \"example-app\",\n  \"scripts\": {\n    \"test\": \"jest\"\n  },\n  \"devDependencies\": {\n    \"jest\": \"^29.7.0\"\n  }\n}\n",
+          "src/shipping.js": "export function calcShipping(total) {\n  if (total >= 3000) return 0;\n  return 500;\n}\n",
+          "docs/requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: 送料計算\n- 注文金額に応じた送料を計算できること。\n",
+          "docs/specification.md": "# 仕様書\n\n## 業務ルール\n\n### 送料計算\n\n| 注文金額 | 送料 |\n| :--- | :--- |\n| 3000円未満 | 500円 |\n| 3000円以上 | 0円 |\n",
+          "docs/architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/shipping.js` で送料を計算する。\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "16": {
+              "number": 16,
+              "title": "[Feature]: 品質ゲートを定める",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\nPR をマージする前に通す品質ゲートを設計文書に定めたい。`npm test` がすべて成功し、`src/` の行カバレッジが80%以上であることをマージの条件にする。\n\n### 受け入れ条件\n\n- [ ] 品質ゲートの内容と基準が設計文書に書かれている\n",
+              "comments": []
+            }
+          }
+        }
+      },
+      "expected": {
+        "summary": "テスト計画の変更は `tests.md` に当たるため、無い `docs/tests.md` だけをテンプレートから作って品質ゲート（`npm test` の成功と `src/` の行カバレッジ80%以上）を書き、変更が当たらない既存の3文書は変えずに設計PRを作成する。",
+        "must": [
+          "`docs/tests.md` をテンプレートの節構成で新しく作り、「品質ゲートと基準」に `npm test` の成功と `src/` の行カバレッジ80%以上を書く",
+          "PR本文に、更新した節と、変更しなかったファイル（`requirements.md`・`specification.md`・`architecture.md`）の理由を書く",
+          "`Refs #16` を含む設計PRを作成する"
+        ],
+        "must_not": [
+          "変更が当たらない `requirements.md`・`specification.md`・`architecture.md` を書き換える",
+          "`docs/tests.md` にテンプレートの HTML コメントや空見出しを残す",
+          "`src/shipping.js` を変更する"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 16", "^pr create"],
+          "git_must_not_modify": ["src/shipping.js", "docs/specification.md"]
         }
       }
     },
@@ -234,11 +282,13 @@
         ],
         "must_not": [
           "`gh pr create` で別の設計PRを新しく作る",
-          "文書内に `仮定` などの未決の印を残す"
+          "文書内に `仮定` などの未決の印を残す",
+          "変更が当たらない `docs/tests.md` をテンプレートから新しく作る"
         ],
         "checks": {
           "gh_must_call": ["^pr view 20"],
-          "gh_must_not_call": ["^pr create"]
+          "gh_must_not_call": ["^pr create"],
+          "git_must_not_modify": ["docs/tests.md"]
         }
       }
     },
@@ -298,10 +348,12 @@
         ],
         "must_not": [
           "マージ済みの `ADR-002` を削除または再採番する",
-          "`ADR-002` が2件重複したまま push する"
+          "`ADR-002` が2件重複したまま push する",
+          "変更が当たらない `requirements.md`・`specification.md`・`tests.md` をテンプレートから新しく作る"
         ],
         "checks": {
-          "gh_must_not_call": ["^pr create"]
+          "gh_must_not_call": ["^pr create"],
+          "git_must_not_modify": ["docs/requirements.md", "docs/specification.md", "docs/tests.md"]
         }
       }
     },
