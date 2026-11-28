@@ -54,6 +54,50 @@
       }
     },
     {
+      "id": "design-new-without-docs-dir",
+      "title": "`docs/` が無いリポジトリでも、設計文書はリポジトリ直下ではなく `docs/` に作る",
+      "branch": "新規作成モード 1（配置先は `docs/` 固定）",
+      "prompt_args": "6",
+      "setup": {
+        "files": {
+          "README.md": "# 送料計算ツール\n\nECサイトの送料を計算するライブラリです。設計資料は `design/` に置く方針です。\n",
+          "AGENTS.md": "# AGENTS.md\n\n- 設計資料は `design/` ディレクトリに置く。\n",
+          "src/index.js": "export const version = '0.1.0';\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "6": {
+              "number": 6,
+              "title": "[Feature]: 注文金額に応じた送料を計算する",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\n注文金額が3000円以上なら送料無料、3000円未満なら送料500円にしたい。\n\n### 受け入れ条件\n\n- [ ] 注文金額から送料が計算できる\n",
+              "comments": []
+            }
+          }
+        }
+      },
+      "expected": {
+        "summary": "`docs/` が無く、リポジトリの規約が別の場所（`design/`）を指していても、設計文書の場所は `docs/` 固定のため `docs/` を作って4ファイルを置き、`Refs #6` の設計PRを作成する。",
+        "must": [
+          "`docs/requirements.md`・`docs/specification.md`・`docs/architecture.md`・`docs/tests.md` を作成する",
+          "`Refs #6` を独立行に含む設計PRを作成する"
+        ],
+        "must_not": [
+          "設計文書をリポジトリ直下や `design/` に作る",
+          "`AGENTS.md` や README を変更する",
+          "プロダクトコードやテストコードを実装する"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 6", "^pr create"],
+          "gh_must_not_call": ["^issue create"],
+          "git_must_not_modify": ["requirements.md", "specification.md", "architecture.md", "tests.md", "design/", "AGENTS.md", "README.md", "src/"]
+        }
+      }
+    },
+    {
       "id": "design-multi-req-issue-stop",
       "title": "要件を複数含む Issue を渡されたとき設計を始めずに止まる",
       "branch": "Issue から設計する / 要件を複数含む Issue",

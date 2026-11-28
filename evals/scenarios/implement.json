@@ -46,6 +46,57 @@
       }
     },
     {
+      "id": "implement-design-docs-only-under-docs",
+      "title": "設計文書は `docs/` だけを見て、リポジトリ直下の同名ファイルは設計文書として扱わない",
+      "branch": "最初に確かめる 2・6 / 設計が足りないとき",
+      "prompt_args": "11",
+      "setup": {
+        "files": {
+          "README.md": "# Example App\n",
+          "requirements.md": "# 要件定義\n\n## 機能要件と受け入れ基準\n\n### FR-1: CSV エクスポート\n- 注文一覧を CSV でダウンロードできること。\n",
+          "specification.md": "# 仕様書\n\n## 業務ルール\n\n### CSV エクスポート\n- 列は `注文ID,注文日,金額` の順で出力する。\n- 文字コードは UTF-8（BOM 付き）とする。\n",
+          "architecture.md": "# アーキテクチャ\n\n## 全体構成と境界\n- `src/export.js` で CSV を組み立てる。\n",
+          "docs/tests.md": "# テスト計画\n\n## 品質ゲートと基準\n- `npm test` を品質ゲートとする。\n",
+          "src/index.js": "export const version = '0.1.0';\n"
+        },
+        "gh": {
+          "repo": "example/app",
+          "user": "agent-user",
+          "issues": {
+            "11": {
+              "number": 11,
+              "title": "[Feature]: 注文一覧を CSV でエクスポートする",
+              "state": "OPEN",
+              "author": {"login": "owner-user"},
+              "body": "### 説明\n\n注文一覧を CSV でダウンロードできるようにしたい。\n",
+              "comments": []
+            }
+          },
+          "prs": []
+        }
+      },
+      "expected": {
+        "summary": "設計文書の場所は `docs/` 固定のため、`docs/tests.md` だけを設計文書とし、リポジトリ直下の `requirements.md` などは設計文書として読まない。CSV エクスポートの仕様が設計文書に無いため実装を始めずに止まり、`/dev-process-kit:design 11` の実行を頼む。",
+        "must": [
+          "設計文書の場所を `docs/` とし、リポジトリ直下の `requirements.md`・`specification.md`・`architecture.md` を設計文書として扱わない",
+          "設計文書（`docs/`）に CSV エクスポートの仕様が無いことを示して実装を始めずに止まる",
+          "`/dev-process-kit:design 11` で設計PRを作るよう利用者に頼んで終える"
+        ],
+        "must_not": [
+          "リポジトリ直下の `specification.md` を正本として実装を始める",
+          "設計文書を自分で作成・移動・編集する",
+          "プロダクトコードやテストを書く、ブランチを作る、PRを作成する"
+        ],
+        "checks": {
+          "gh_must_call": ["^issue view 11"],
+          "gh_must_not_call": ["^pr create", "^issue create"],
+          "git_must_not_push": true,
+          "git_branch_must_stay": "main",
+          "git_must_not_modify": ["docs/", "requirements.md", "specification.md", "architecture.md", "src/"]
+        }
+      }
+    },
+    {
       "id": "implement-spec-missing-open-design-pr",
       "title": "設計文書に仕様が無く、未マージの設計PRがあるときはマージ待ちで止まる",
       "branch": "最初に確かめる 6 / 設計が足りないとき 2（未マージの設計PRがある）",

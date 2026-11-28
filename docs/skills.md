@@ -66,7 +66,7 @@ It runs only when called by name. A general request such as "design #12" or "wri
 | `architecture.md` | Which structure and constraints realize it, and why | Structure and dependencies, design decisions (ADRs), persistence and migration, shared implementation conventions, how non-functional targets are met |
 | `tests.md` | What to verify, how far, in which environment, and by which criteria | Test scope, test levels and tools, test environments and external boundaries, quality gates and criteria, exit criteria, key risks and verification limits |
 
-Existing conventions decide where the documents live. Without one, they go under an existing `docs/` directory, or at the repository root if there is none.
+The documents always live under `docs/` at the repository root (created if missing). In a monorepo, each service's set lives under `docs/` in that service's directory. Other repository conventions do not change this location.
 
 ### What it does
 
@@ -102,7 +102,7 @@ It runs only when called by name. A general request such as "fix #12" does not s
 
 ### What it does
 
-- Looks for the design documents in the same order that `design` uses to place them (existing conventions, under `docs/`, the repository root). It uses that location to tell whether design documents exist and whether a PR is a design PR.
+- Reads the design documents only from `docs/`, where `design` places them (files with the same names elsewhere, such as at the repository root, are not design documents). It uses that location to tell whether design documents exist and whether a PR is a design PR.
 - Reads the Issue and the diff of the related design PRs, and decides the scope of work by matching them against the design documents.
 - Does not start implementing if there are no design documents, if the Issue's content is not in the design documents (for a bug report, the correct behavior it expects, not the failure itself), or if `TBD` remains in the scope. Instead, it waits for an unmerged design PR to be merged, or tells you what is missing and asks you to run `/dev-process-kit:design`. It does not write design documents itself.
 - Writes tests at the following level for each design document.
