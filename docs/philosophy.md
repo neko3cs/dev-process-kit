@@ -112,7 +112,7 @@ This plugin decides the flow of the phases and the rules that keep the flow inta
 | Decided by this plugin | Left to the repository's conventions and the user's instructions |
 | :--- | :--- |
 | Requests are filed as Issues | How Issue templates are structured |
-| Design is recorded in four design documents | Where the design documents live (existing conventions win) |
+| Design is recorded in four design documents under `docs/` | The language the design documents are written in (existing conventions win) |
 | Merging the design PR freezes the specification | PR format and templates |
 | One implementation PR per Issue | Branch names, how branches are created, and how the integration branch is incorporated |
 | The PR stays in Draft while a decision is pending | Coding conventions |
